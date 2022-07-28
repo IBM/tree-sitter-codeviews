@@ -1,0 +1,29 @@
+{
+    "src_language" : "java",
+    "file_name" : "Max.java",
+    "combined" : true,
+    "code_view" : "CFG",
+    "graph_format" : "dot",
+    
+    
+    "combined_views" : {
+        "DFG" : {
+            "exists" : true,
+            "collapsed" : false,
+            "minimized" : false,
+            "statements": false
+        },
+        "AST" : {
+            "exists" : true,
+            "collapsed" : false,
+            "minimized" : false,
+            "blacklisted" : ["expression_statement", "method_invocation", "class_body", "class_declaration", "modifiers"]
+
+        },
+        "CFG" : {
+            "exists" : true,
+            "collapsed" : false,
+            "minimized" : false
+        }
+    }
+}
