@@ -1,5 +1,5 @@
 from tree_parser.java_parser import JavaParser
-from tree_parser.python_parser import PythonParser
+# from tree_parser.python_parser import PythonParser
 from utils import preprocessor
 
 class ParserDriver():
@@ -12,7 +12,7 @@ class ParserDriver():
 
         self.parser_map = {
             'java': JavaParser,
-            'python': PythonParser
+            # 'python': PythonParser
             # Add more languages here
         }
         self.parser = self.parser_map[self.src_language](self.src_language, self.src_code)
