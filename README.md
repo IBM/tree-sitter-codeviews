@@ -22,7 +22,6 @@ To do this, run the setup script in the root directory of the folder using the f
 ``` bash setup.sh```
 
 2. To generate a code view (AST, DFG, or CFG), follow the following steps
-> Note: There is a bug in statement level DFGs but all other combinations should work properly.
 
 - In the ``config.json`` file, set the  the ``"combined": true``
 - Save the source code in the ``code_test_files/`` directory, inside the appropriate subdirectory marked by the source language. Then enter the file in the ``file_name`` field in the ``config.json``
