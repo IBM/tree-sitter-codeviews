@@ -135,7 +135,7 @@ The code is structured in the following way:
 ### Testing
 To test the working of the repository, please check the [testing](testing) folder for test cases and testing scripts. You may modify the commands in the [run.sh](run.sh) script to run various testing scripts that will automatically run the systematically grouped test cases and compare them against the expected results and report if they passed or failed. 
 
-#### Hardware and software requirements
+#### Hardware and  software requirements
 The code in this repository was developed and tested on a machine with 32 GB RAM, Intel i7 processor and MacOS. However, this is not a sctrict requirement and any machine with 8GB or more RAM should perform quite efficiently. Any OS that can run Python and install the following dependencies can run this code.
 The software dependencies are: 
 - [tree-sitter](https://tree-sitter.github.io/tree-sitter/)
