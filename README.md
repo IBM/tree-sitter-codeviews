@@ -1,4 +1,4 @@
-# Tree Sitter Mutli Codeview Generator
+# Tree Sitter Multi Codeview Generator
 ## OSCP Project
 
 ### Project Description
