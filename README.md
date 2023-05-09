@@ -1,4 +1,53 @@
 # Tree Sitter Multi Codeview Generator
+
+## Comex Package
+`comex` is a rebuild of Tree Sitter Multi Codeview Generator for easier invocation as a Python package. 
+It isolates the logic pertaining to the generation and combination of codeviews to better differentiate tasks involved in the IBM OSCP Project.
+
+**Note**: Please clone recursively so sub-modules are setup correctly
+```console
+git clone --recursive {...}
+```
+
+### Install
+
+As of writing this, `comex` has not been published to pypi or other python registries
+
+To setup `comex` for development in your python environment:
+
+```console
+pip install -r requirements-dev.txt
+```
+
+You would need to install GraphViz([dot](https://graphviz.org/download/)) so that the graph visualizations are generated
+
+This performs an editable install, meaning that comex would be available throughout your environment (particularly relevant if you use conda or something of the sort). This means now you can interact and import from `comex` just like any other package while remaining standalone but also reflecting any code side updates without any other manual steps
+
+### Testing
+
+The repo is setup to automatically perform CI tests on making pulls to main and development branches.
+To test locally:
+
+Run specific test 
+- Say you wish to run `test_cfg` function
+- drop the `'[...]'` part to run all tests in a file
+  - formatted as [extension-filename]
+- no-cov prevents coverage report from being printed
+```console
+pytest -k 'test_cfg[cs-test7]' --no-cov
+```
+
+Run all tests and get coverage report
+```console
+pytest
+```
+
+Analyze the deviation report given by `deepdiff` by using the verbose output.
+This will help quickly figure out difference from the gold file
+```console
+pytest -k 'test_cfg[cs-test7]' --no-cov -vv
+```
+
 ## OSCP Project
 
 ### Project Description
@@ -120,8 +169,6 @@ public class Max {
 <img src="output_graphs/readme_combined_graph.svg" >
 
 
-> Note: We use code snippets from [GraphCODEBERT](https://github.com/microsoft/CodeBERT/tree/master/GraphCodeBERT) for DFG generation, which is permitted under its MIT License. 
-
 ### Code Organization
 The code is structured in the following way:
 1. Input Files are placed in [code_test_files](code_test_files) directory grouped by language.
@@ -135,7 +182,7 @@ The code is structured in the following way:
 ### Testing
 To test the working of the repository, please check the [testing](testing) folder for test cases and testing scripts. You may modify the commands in the [run.sh](run.sh) script to run various testing scripts that will automatically run the systematically grouped test cases and compare them against the expected results and report if they passed or failed. 
 
-#### Hardware and  software requirements
+#### Hardware and software requirements
 The code in this repository was developed and tested on a machine with 32 GB RAM, Intel i7 processor and MacOS. However, this is not a sctrict requirement and any machine with 8GB or more RAM should perform quite efficiently. Any OS that can run Python and install the following dependencies can run this code.
 The software dependencies are: 
 - [tree-sitter](https://tree-sitter.github.io/tree-sitter/)
