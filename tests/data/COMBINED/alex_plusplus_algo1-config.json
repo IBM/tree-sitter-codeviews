@@ -1,0 +1,25 @@
+{
+    "combined_views" : {
+        "AST" : {
+            "exists" : false,
+            "collapsed" : false,
+            "minimized" : false,
+            "blacklisted" : ["expression_statement", "method_invocation", "class_body", "class_declaration", "modifiers"]
+
+        },
+        "DFG" : {
+            "exists" : true,
+            "rda_statements": true,
+            "collapsed" : false,
+            "minimized" : false,
+            "statements": true,
+            "last_use": true,
+            "last_def": true,
+            "alex_algo": true
+        },
+        "CFG" : {
+            "exists" : true
+
+        }
+    }
+}
