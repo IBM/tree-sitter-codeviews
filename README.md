@@ -80,7 +80,7 @@ Combined simple AST+CFG+DFG for a simple Java program that finds the maximum amo
 The code is structured in the following way:
 1. For each code-view, first the source code is parsed using the tree-sitter parser and then the various code-views are generated. In the [tree_parser](src/comex/tree_parser) directory, the Parser and ParserDriver is implemented with various funcitonalities commonly required by all code-views. Language-specific features are further developed in the language-specific parsers also placed in this directory.
 2. The [codeviews](src/comex/codeviews) directory contains the core logic for the various codeviews. Each codeview has a driver class and a codeview class, which is further inherited and extended by language in case of code-views that require language-specific implementation.
-3. The [cli.py](src/comex/cli.py) file is the CLI implementation. The drivers can also be directly imported and used as a python package. It is responsible for parsing the source code and generating the codeviews.
+3. The [cli.py](src/comex/cli.py) file is the CLI implementation. The drivers can also be directly imported and used like a python package. It is responsible for parsing the source code and generating the codeviews.
 
 ### Testing
 
@@ -89,7 +89,7 @@ To test locally:
 
 Run specific test 
 - Say you wish to run `test_cfg` function
-- drop the `'[...]'` part to run all tests in a file
+- Drop the `'[...]'` part to run all tests in a file
   - formatted as [extension-filename]
 - no-cov prevents coverage report from being printed
 ```console
