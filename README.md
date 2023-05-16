@@ -12,7 +12,7 @@ It isolates the logic pertaining to the generation and combination of codeviews 
 git clone --recursive {...}
 ```
 
-### Install
+### Installation
 
 As of writing this, `comex` has not been published to pypi or other python registries
 
