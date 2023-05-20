@@ -73,7 +73,7 @@ codeviews: refers to the configuration passed for each codeview
 
 Combined simple AST+CFG+DFG for a simple Java program that finds the maximum among 2 numbers:
 
-<img src="sample.png" >
+<img src="https://github.com/IBM/tree-sitter-codeviews/raw/main/sample.png" >
 
 
 ### Code Organization
@@ -106,6 +106,24 @@ This will help quickly figure out difference from the gold file
 ```console
 pytest -k 'test_cfg[cs-test7]' --no-cov -vv
 ```
+
+### Publishing
+
+Make sure to bump the version in `setup.cfg`.
+
+Then run the following commands:
+
+```bash
+rm -rf build dist
+python setup.py sdist bdist_wheel
+```
+
+Then upload it to PyPI using [twine](https://twine.readthedocs.io/en/latest/#installation) (`pip install twine` if not installed):
+
+```bash
+twine upload dist/*
+```
+
 
 ### About the IBM OSCP Project
 This tool was developed for research purposes as a part of the OSCP Project. Efficient representation of source code is essential for various software engineering tasks using AI pipelines such as code translation, code search and code clone detection. Code Representation aims at extracting the both syntactic and semantic features of source code and representing them by a vector which can be readily used for the downstream tasks. Multiple works exist that attempt to encode the code as sequential data to easily leverage state of art NN models like transformers. But it leads to a loss of information. Graphs are a natural representation for the code but very few works(MVG-AAAI’22) have tried to represent the different code features obtained from different code views like Program Dependency Graph, Data Flow Graph etc. as a multi-view graph. In this work, we want to explore more code views and its relevance to different code tasks as well as leverage transformers model for the multi-code view graphs. We believe such a work will help to 
