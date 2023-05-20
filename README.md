@@ -7,25 +7,30 @@ Tree Sitter Multi Codeview Generator aims to generate combined multi-code view g
 This rebuild also includes a cli interface for easier usage.
 It isolates the logic pertaining to the generation and combination of codeviews to better differentiate tasks involved in the `IBM OSCP Project`.
 
+### Installation
+
+`comex` is published on the Python Registry and can be easily installed via pip:
+
+```console
+pip install comex
+```
+
+**Note**: You would need to install GraphViz([dot](https://graphviz.org/download/)) so that the graph visualizations are generated
+
+---
+To setup `comex` for development using the source code in your python environment:
+
+```console
+pip install -r requirements-dev.txt
+```
 **Note**: Please clone recursively so sub-modules are setup correctly
 ```console
 git clone --recursive {...}
 ```
 
-### Installation
-
-As of writing this, `comex` has not been published to pypi or other python registries
-
-To setup `comex` for development in your python environment:
-
-```console
-pip install -r requirements-dev.txt
-```
-
-You would need to install GraphViz([dot](https://graphviz.org/download/)) so that the graph visualizations are generated
-
 This performs an editable install, meaning that comex would be available throughout your environment (particularly relevant if you use conda or something of the sort). This means now you can interact and import from `comex` just like any other package while remaining standalone but also reflecting any code side updates without any other manual steps
 
+---
 ### Usage as a CLI
 
 This is the recommended way to get started with `comex` as it is the most user friendly
