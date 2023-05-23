@@ -1,0 +1,10 @@
+LICENSE
+README.md
+setup.cfg
+setup.py
+src/comex.egg-info/PKG-INFO
+src/comex.egg-info/SOURCES.txt
+src/comex.egg-info/dependency_links.txt
+src/comex.egg-info/entry_points.txt
+src/comex.egg-info/requires.txt
+src/comex.egg-info/top_level.txt
