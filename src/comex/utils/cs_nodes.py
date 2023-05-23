@@ -9,6 +9,7 @@ class_declaration_statements = [
     "constructor_declaration",
     "interface_declaration",
     "property_declaration",
+    "class_declaration",
 ]
 
 inner_node_type = [
@@ -55,7 +56,7 @@ statement_types = {
         # 'try_with_resources_statement'
     ],
 }
-
+# TODO: add method_return_types
 
 def cl(child):
     if child is None:
@@ -221,6 +222,18 @@ def get_nodes(root_node=None, node_list={}, graph_node_list=[], index={}, record
                         type_label,
                     )
                 )
+            elif (
+                root_node.type == "class_declaration"
+                # or root_node.type == "constructor_declaration"
+            ):
+                modifiers = list(filter(lambda child: child.type != "declaration_list", root_node.children))
+                class_name = list(filter(lambda child: child.type == "identifier", root_node.children))[0].text.decode("UTF-8")
+                label = ""
+                for modifier in modifiers:
+                    label = label + modifier.text.decode("UTF-8") + " "
+                type_label = root_node.type
+                class_index = index[(root_node.start_point, root_node.end_point, root_node.type)]
+                records["class_list"][class_name] = class_index
 
             elif root_node.type == "if_statement":
                 condition = root_node.child_by_field_name("condition")
