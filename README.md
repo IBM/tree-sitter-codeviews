@@ -1,143 +1,148 @@
-# Tree Sitter Mutli Codeview Generator
-## OSCP Project
+# Tree Sitter Multi Codeview Generator
 
-### Project Description
-Efficient representation of source code is essential for various software engineering tasks using AI pipelines such as code translation, code search and code clone detection. Code Representation aims at extracting the both syntactic and semantic features of source code and representing them by a vector which can be readily used for the downstream tasks. Multiple works exist that attempt to encode the code as sequential data to easily leverage state of art NN models like transformers. But it leads to a loss of information. Graphs are a natural representation for the code but very few works(MVG-AAAI’22) have tried to represent the different code features obtained from different code views like Program Dependency Graph, Data Flow Graph etc. as a multi-view graph. In this work, we want to explore more code views and its relevance to different code tasks as well as leverage transformers model for the multi-code view graphs. We believe such a work will help to 
-1. Establish influence of specific code views for the  common task 
-2. Demonstrate how graphs can combined with transformers 
-3. Create re-usable models
+Tree Sitter Multi Codeview Generator aims to generate combined multi-code view graphs that can be used with various types of machine learning models (sequence model neural networks, graph neural networks, etc). It is also designed to be easily extended to various source code languages. [tree-sitter](https://tree-sitter.github.io/tree-sitter/) is used for parsing which is highly efficient and has support for over 40+ languages. Currently, this repository supports codeviews for Java in over 40 possible combinations of codeviews. It has been structured such that support for other languages can be easily added. If you wish to add support for more languages, please refer to the [contributing](CONTRIBUTING.md) guide.
 
-### Why is this repository interesting and useful?
-This repository is designed to be used for research purposes - to generate combined multi-code view graphs that can be used with various types of machine learning models (sequence model neural networks, graph neural networks, etc). It is also designed to be easily extended to various source code languages. [tree-sitter](https://tree-sitter.github.io/tree-sitter/) is used for parsing which is highly efficient and has support for over 40+ languages. Currently, this repository supports codeviews for Java in over 40 possible combinations of codeviews. It has been structured such that support for other languages can be easily added. If you wish to add support for more languages, please refer to the [contributing](CONTRIBUTING.md) guide.
+## Comex
+`comex` is a rebuild of Tree Sitter Multi Codeview Generator for easier invocation as a Python package. 
+This rebuild also includes a cli interface for easier usage.
+It isolates the logic pertaining to the generation and combination of codeviews to better differentiate tasks involved in the `IBM OSCP Project`.
 
+### Installation
 
-### Setup to run the code
+`comex` is published on the Python Registry and can be easily installed via pip:
 
-1. For intial setup
-
-You need to clone all the tree sitter repositories of the grammars of the languages. 
-To do this, run the setup script in the root directory of the folder using the following command.
-(This setup requires pip to be installed. If you wish to use a conda environment, you can also setup the environment using the ``environment.yml`` file in the root directory.)
-
-``` bash setup.sh```
-
-2. To generate a code view (AST, DFG, or CFG), follow the following steps
-
-- In the ``config.json`` file, set the  the ``"combined": true``
-- Save the source code in the ``code_test_files/`` directory, inside the appropriate subdirectory marked by the source language. Then enter the file in the ``file_name`` field in the ``config.json``
-- Modify the ``"code_views"`` field according to what you want to generate.
-- Run the command   ```python3 main.py```   in the home directory to generate code views.
-- The output dot files and json files will be generated in the ``output_graphs`` and ``outout_json`` directories respectively, along with suitable names
-- To make modifications to input and output preferences, refer to and modify the source code in `` main.py``  and ``codeviews/combined_graph/combined_driver.py`` respectively.
-
-3. To visualize the generated files using GraphViz within VS Code, use this [extension](https://marketplace.visualstudio.com/items?itemName=tintinweb.graphviz-interactive-preview). 
-
-**EXAMPLE CONFIG FILE** - 
-To generate simple AST
-
+```console
+pip install comex
 ```
-{
-    "src_language" : "java",
-    "file_name" : "Graph.java",
-    "combined" : true,
-    "code_view" : "CFG",
-    "graph_format" : "json",
-    
-    "combined_views" : {
-        "DFG" : {
-            "exists" : false,
-            "collapsed" : false,
-            "minimized" : false
-        },
-        "AST" : {
-            "exists" : true,
-            "collapsed" : false,
-            "minimized" : false,
-            "blacklisted" : ["expression_statement", "method_invocation"]
 
-        },
-        "CFG" : {
-            "exists" : false,
-            "collapsed" : false,
-            "minimized" : false
-        }
-    }
-}
+**Note**: You would need to install GraphViz([dot](https://graphviz.org/download/)) so that the graph visualizations are generated
+
+---
+To setup `comex` for development using the source code in your python environment:
+
+```console
+pip install -r requirements-dev.txt
 ```
-To generate collapsed and combined AST and DFG
-
+**Note**: Please clone recursively so sub-modules are setup correctly
+```console
+git clone --recursive {...}
 ```
-{
-    "src_language" : "java",
-    "file_name" : "Graph.java",
-    "combined" : true,
-    "code_view" : "CFG",
-    "graph_format" : "json",
-    
-    "combined_views" : {
-        "DFG" : {
-            "exists" : true,
-            "collapsed" : true,
-            "minimized" : false
-        },
-        "AST" : {
-            "exists" : true,
-            "collapsed" : true,
-            "minimized" : false,
-            "blacklisted" : ["expression_statement", "method_invocation"]
 
-        },
-        "CFG" : {
-            "exists" : false,
-            "collapsed" : false,
-            "minimized" : false
-        }
-    }
-}
+This performs an editable install, meaning that comex would be available throughout your environment (particularly relevant if you use conda or something of the sort). This means now you can interact and import from `comex` just like any other package while remaining standalone but also reflecting any code side updates without any other manual steps
+
+---
+### Usage as a CLI
+
+This is the recommended way to get started with `comex` as it is the most user friendly
+
+The attributes and options supported by the CLI are well documented and can be viewed by running:
+```console
+comex --help
 ```
-### Examples of generated graphs:
 
-Combined simple AST+CFG+DFG for a simple Java program that finds Max: 
+For example, to generate a combined CFG and DFG graph for a java file, you can run:
+```console
+comex --lang "java" --code-file ./test.java --graphs "cfg,dfg"
 ```
-public class Max {
-    public static void main (String[] args) {
-        int x,y,max;
-        x=3;
-        y=6;
-        if (x>y)
-            max = x;
-        else 
-            max = y;
 
-        return;
-    }
-}
+### Usage as a Python Package
+
+The comex package can be used by importing required drivers as follows:
+
+```python
+from comex.codeviews.combined_graph.combined_driver import CombinedDriver
+
+CombinedDriver(
+    src_language=lang,
+    src_code=code,
+    output_file="output.json",
+    graph_format=output,
+    codeviews=codeviews
+)
 ```
-- Violet edges - AST edges
-- Blue edges - Data Flow edges
-- Red edges - Control Flow edges
+In most cases the required combination can be obtained via the `combined_driver` module as shown above.
 
-<img src="output_graphs/readme_combined_graph.svg" >
+````
+src_language: denotes one of the supported languaged hence currently "java" or "cs"
 
+src_code: denotes the source code to be parsed
 
-> Note: We use code snippets from [GraphCODEBERT](https://github.com/microsoft/CodeBERT/tree/master/GraphCodeBERT) for DFG generation, which is permitted under its MIT License. 
+output_file: denotes the output file to which the generated graph is written
+
+graph_format: denotes the format of the output graph. Currently supported formats are "dot" and "json". To generate both pass "all"
+
+codeviews: refers to the configuration passed for each codeview
+````
+
+### Output Example:
+
+Combined simple AST+CFG+DFG for a simple Java program that finds the maximum among 2 numbers:
+
+<img src="https://github.com/IBM/tree-sitter-codeviews/raw/main/sample.png" >
+
 
 ### Code Organization
 The code is structured in the following way:
-1. Input Files are placed in [code_test_files](code_test_files) directory grouped by language.
-2. Output Files are placed in [output_graphs](output_graphs) and [output_json](output_json) directories.
-3. For each code-view, first the source code is parsed using the tree-sitter parser and then the various code-views are generated. In the [tree_parser](tree_parser) directory, the Parser and ParserDriver is implemented with various funcitonalities commonly required by all code-views. Language-specific features are further developed in the language-specific parsers also placed in this directory.
-4. The [codeviews](codeviews) directory contains the core logic for the various codeviews. Each codeview has a driver class and a codeview class, which is further inherited and extended by language in case of code-views that require language-specific implementation.
-5. The [main.py](main.py) file is the driver for the codeview generation. It is responsible for parsing the source code and generating the codeviews.
-6. The [config.json](config.json) file contains the configuration for the codeview generation.
-> Note: The main original contributions of this repository are in the [codeviews](codeviews) and [tree-parser](tree-parser) directories. 
+1. For each code-view, first the source code is parsed using the tree-sitter parser and then the various code-views are generated. In the [tree_parser](src/comex/tree_parser) directory, the Parser and ParserDriver is implemented with various funcitonalities commonly required by all code-views. Language-specific features are further developed in the language-specific parsers also placed in this directory.
+2. The [codeviews](src/comex/codeviews) directory contains the core logic for the various codeviews. Each codeview has a driver class and a codeview class, which is further inherited and extended by language in case of code-views that require language-specific implementation.
+3. The [cli.py](src/comex/cli.py) file is the CLI implementation. The drivers can also be directly imported and used like a python package. It is responsible for parsing the source code and generating the codeviews.
 
 ### Testing
-To test the working of the repository, please check the [testing](testing) folder for test cases and testing scripts. You may modify the commands in the [run.sh](run.sh) script to run various testing scripts that will automatically run the systematically grouped test cases and compare them against the expected results and report if they passed or failed. 
 
-#### Hardware and  software requirements
-The code in this repository was developed and tested on a machine with 32 GB RAM, Intel i7 processor and MacOS. However, this is not a sctrict requirement and any machine with 8GB or more RAM should perform quite efficiently. Any OS that can run Python and install the following dependencies can run this code.
-The software dependencies are: 
-- [tree-sitter](https://tree-sitter.github.io/tree-sitter/)
-- [networkx](https://networkx.org/)
-- [Graphviz-python](https://pypi.org/project/graphviz-python/)
+The repo is setup to automatically perform CI tests on making pulls to main and development branches.
+To test locally:
+
+Run specific test 
+- Say you wish to run `test_cfg` function
+- Drop the `'[...]'` part to run all tests in a file
+  - formatted as [extension-filename]
+- no-cov prevents coverage report from being printed
+```console
+pytest -k 'test_cfg[cs-test7]' --no-cov
+```
+
+Run all tests and get coverage report
+```console
+pytest
+```
+
+Analyze the deviation report given by `deepdiff` by using the verbose output.
+This will help quickly figure out difference from the gold file
+```console
+pytest -k 'test_cfg[cs-test7]' --no-cov -vv
+```
+
+### Publishing
+
+Make sure to bump the version in `setup.cfg`.
+
+Then run the following commands:
+
+```bash
+rm -rf build dist
+python setup.py sdist bdist_wheel
+```
+
+Then upload it to PyPI using [twine](https://twine.readthedocs.io/en/latest/#installation) (`pip install twine` if not installed):
+
+```bash
+twine upload dist/*
+```
+
+
+### About the IBM OSCP Project
+This tool was developed for research purposes as a part of the OSCP Project. Efficient representation of source code is essential for various software engineering tasks using AI pipelines such as code translation, code search and code clone detection. Code Representation aims at extracting the both syntactic and semantic features of source code and representing them by a vector which can be readily used for the downstream tasks. Multiple works exist that attempt to encode the code as sequential data to easily leverage state of art NN models like transformers. But it leads to a loss of information. Graphs are a natural representation for the code but very few works(MVG-AAAI’22) have tried to represent the different code features obtained from different code views like Program Dependency Graph, Data Flow Graph etc. as a multi-view graph. In this work, we want to explore more code views and its relevance to different code tasks as well as leverage transformers model for the multi-code view graphs. We believe such a work will help to 
+1. Establish influence of specific code views for common tasks 
+2. Demonstrate how graphs can combined with transformers 
+3. Create re-usable models
+
+### Team
+
+This tool is based on the ongoing joint research effort between IBM and [Risha Lab](https://rishalab.in/) at [IIT Tirupati](https://www.iittp.ac.in/) to explore the effects of different code representations on code based tasks involving: 
+ - [Srikanth Tamilselvam](https://www.linkedin.com/in/srikanth-tamilselvam-913a2ab/)
+ - [Sridhar Chimalakonda](https://www.linkedin.com/in/sridharch/)
+ - [Alex Mathai](https://www.linkedin.com/in/alex-mathai-403117131/)
+ - [Debeshee Das](https://www.linkedin.com/in/debeshee-das/) 
+ - [Noble Saji Mathews](https://www.linkedin.com/in/noble-saji-mathews/) 
+ - [Kranthi Sedamaki](https://www.linkedin.com/in/kranthisedamaki/) 
+ - [Atul Kumar](https://www.linkedin.com/in/atul-kumar-0ba442/) 
