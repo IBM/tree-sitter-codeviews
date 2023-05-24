@@ -10,6 +10,8 @@ from comex.codeviews.SDFG.SDFG_java import dfg_java
 from comex.utils import postprocessor, DFG_utils
 
 debug = False
+
+
 # if any(
 #         # GITHUB_ACTIONS
 #         x in os.environ for x in ("PYCHARM_HOSTED",)
@@ -70,7 +72,6 @@ class DfgRda:
                 )
             self.json = postprocessor.write_networkx_to_json(self.graph, output_file)
 
-
     def get_graph(self):
         return self.graph
 
@@ -108,18 +109,18 @@ if __name__ == '__main__':
     # sample_file = lines[sample_id]
 
     # "cs",
-    for extension in ("java",):
-        file = f"test_manual.{extension}"
+    for extension in ("java", "cs"):
+        file = f"data/test_manual.{extension}"
         if not os.path.isfile(file):
             continue
         with open(file, "r") as f:
             sample_file = f.read()
 
-        output_file = f"{extension}_test.json"
+        output_file = f"data/{extension}_test.json"
         # src_code = src_parser.pre_process_src(extension, sample_file, wrap_class=False)
         src_code = sample_file
-        with open("test." + extension, "w") as f:
-            f.write(src_code)
+        # with open("data/test." + extension, "w") as f:
+        #     f.write(src_code)
         result = DfgRda(
             src_language=extension,
             src_code=src_code,
@@ -134,6 +135,6 @@ if __name__ == '__main__':
         debug_graph = result.debug_graph
         postprocessor.write_to_dot(
             debug_graph,
-            "debug_" + output_file.rsplit(".", 1)[0] + ".dot",
+            output_file.rsplit(".", 1)[0] + "_debug.dot",
             output_png=True,
         )
