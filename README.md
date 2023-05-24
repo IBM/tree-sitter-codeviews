@@ -144,5 +144,4 @@ This tool is based on the ongoing joint research effort between IBM and [Risha L
  - [Alex Mathai](https://www.linkedin.com/in/alex-mathai-403117131/)
  - [Debeshee Das](https://www.linkedin.com/in/debeshee-das/) 
  - [Noble Saji Mathews](https://www.linkedin.com/in/noble-saji-mathews/) 
- - [Kranthi Sedamaki](https://www.linkedin.com/in/kranthisedamaki/) 
- - [Atul Kumar](https://www.linkedin.com/in/atul-kumar-0ba442/) 
+ - [Kranthi Sedamaki](https://www.linkedin.com/in/kranthisedamaki/)
