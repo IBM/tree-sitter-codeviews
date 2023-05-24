@@ -2,6 +2,18 @@ import tempfile
 
 from tree_sitter import Language, Parser
 import os
+import subprocess
+
+
+def get_commit_hash(directory):
+    try:
+        result = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=directory, capture_output=True, text=True)
+        if result.returncode == 0:
+            commit_hash = result.stdout.strip()
+            return commit_hash
+        return None
+    except FileNotFoundError:
+        return None
 
 
 class CustomParser:
@@ -15,21 +27,44 @@ class CustomParser:
         self.src_code = src_code
         self.index = {}
 
-        grandparent_folder = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
         shared_languages = os.path.join(tempfile.gettempdir(), "comex", "languages.so")
+        grandparent_folder = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+        vendor_languages = [
+            os.path.join(grandparent_folder, "vendor/tree-sitter-java"),
+            os.path.join(grandparent_folder, "vendor/tree-sitter-c-sharp"),
+            # "vendor/tree-sitter-ruby",
+            # "vendor/tree-sitter-go",
+            # "vendor/tree-sitter-php",
+            # os.path.join(grandparent_folder,"vendor/tree-sitter-python"),
+            # "vendor/tree-sitter-javascript",
+        ]
+
+        build_id = ""
+        for vendor_language in vendor_languages:
+            commit_hash = get_commit_hash(vendor_language)
+            if commit_hash:
+                build_id += commit_hash
+            else:
+                build_id += "ERROR"
+        build_id_file = os.path.join(tempfile.gettempdir(), "comex", "build_id")
+
+        # check if the build_id is the same as the one stored in the file
+        # if not, rebuild the shared library
+        if os.path.exists(build_id_file):
+            with open(build_id_file, "r") as f:
+                stored_build_id = f.read()
+            if build_id != stored_build_id:
+                os.remove(shared_languages)
+        else:
+            if os.path.exists(shared_languages):
+                os.remove(shared_languages)
+        with open(build_id_file, "w") as f:
+            f.write(build_id)
 
         self.language = Language.build_library(
             # Store the library in the `build` directory
             shared_languages,
-            [
-                os.path.join(grandparent_folder, "vendor/tree-sitter-java"),
-                os.path.join(grandparent_folder, "vendor/tree-sitter-c-sharp"),
-                # "vendor/tree-sitter-ruby",
-                # "vendor/tree-sitter-go",
-                # "vendor/tree-sitter-php",
-                # os.path.join(grandparent_folder,"vendor/tree-sitter-python"),
-                # "vendor/tree-sitter-javascript",
-            ],
+            vendor_languages,
         )
         # PYTHON_LANGUAGE = Language("build/my-languages.so", "python")
         JAVA_LANGUAGE = Language(shared_languages, "java")
