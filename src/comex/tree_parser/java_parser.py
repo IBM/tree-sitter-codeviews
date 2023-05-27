@@ -1,4 +1,4 @@
-from comex.tree_parser.custom_parser import CustomParser
+from ..tree_parser.custom_parser import CustomParser
 
 class JavaParser(CustomParser):
     def __init__(self, src_language, src_code):

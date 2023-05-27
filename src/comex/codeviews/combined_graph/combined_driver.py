@@ -2,10 +2,10 @@ import os
 
 import networkx as nx
 
-from comex.codeviews.AST.AST_driver import ASTDriver
-from comex.codeviews.CFG.CFG_driver import CFGDriver
-from comex.codeviews.DFG.DFG_driver import DFGDriver
-from comex.utils import postprocessor
+from ..AST.AST_driver import ASTDriver
+from ..CFG.CFG_driver import CFGDriver
+from ..DFG.DFG_driver import DFGDriver
+from ...utils import postprocessor
 
 
 class CombinedDriver:

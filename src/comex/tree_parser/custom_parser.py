@@ -1,9 +1,9 @@
+import shutil
 import tempfile
 
 from tree_sitter import Language, Parser
 import os
 import subprocess
-
 
 def get_commit_hash(directory):
     try:
@@ -27,39 +27,51 @@ class CustomParser:
         self.src_code = src_code
         self.index = {}
 
-        shared_languages = os.path.join(tempfile.gettempdir(), "comex", "languages.so")
-        grandparent_folder = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-        vendor_languages = [
-            os.path.join(grandparent_folder, "vendor/tree-sitter-java"),
-            os.path.join(grandparent_folder, "vendor/tree-sitter-c-sharp"),
-            # "vendor/tree-sitter-ruby",
-            # "vendor/tree-sitter-go",
-            # "vendor/tree-sitter-php",
-            # os.path.join(grandparent_folder,"vendor/tree-sitter-python"),
-            # "vendor/tree-sitter-javascript",
+        clone_directory = os.path.join(tempfile.gettempdir(), "comex")
+        shared_languages = os.path.join(clone_directory, "languages.so")
+
+        grammar_repos = [
+            ("https://github.com/tree-sitter/tree-sitter-java", "09d650def6cdf7f479f4b78f595e9ef5b58ce31e"),
+            ("https://github.com/tree-sitter/tree-sitter-c-sharp", "3ef3f7f99e16e528e6689eae44dff35150993307")
         ]
+        vendor_languages = []
 
-        build_id = ""
-        for vendor_language in vendor_languages:
-            commit_hash = get_commit_hash(vendor_language)
-            if commit_hash:
-                build_id += commit_hash
-            else:
-                build_id += "ERROR"
-        build_id_file = os.path.join(tempfile.gettempdir(), "comex", "build_id")
-
-        # check if the build_id is the same as the one stored in the file
-        # if not, rebuild the shared library
-        if os.path.exists(build_id_file):
-            with open(build_id_file, "r") as f:
-                stored_build_id = f.read()
-            if build_id != stored_build_id:
-                os.remove(shared_languages)
+        if not os.path.isfile(shared_languages):
+            print("First time running COMEX: Setting up tree-sitter grammars")
+            for url, commit in grammar_repos:
+                vendor_language = os.path.join(clone_directory, url.rstrip("/").split("/")[-1])
+                vendor_languages.append(vendor_language)
+                if os.path.exists(vendor_language):
+                    shutil.rmtree(vendor_language)
+                os.makedirs(vendor_language, exist_ok=True)
+                subprocess.check_call(["git", "init"], cwd=vendor_language, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                subprocess.check_call(["git", "remote", "add", "origin", url], cwd=vendor_language, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                subprocess.check_call(["git", "fetch", "--depth=1", "origin", commit], cwd=vendor_language, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                subprocess.check_call(["git", "checkout", commit], cwd=vendor_language, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         else:
-            if os.path.exists(shared_languages):
-                os.remove(shared_languages)
-        with open(build_id_file, "w") as f:
-            f.write(build_id)
+            for url, commit in grammar_repos:
+                vendor_language = os.path.join(clone_directory, url.rstrip("/").split("/")[-1])
+                vendor_languages.append(vendor_language)
+
+        # build_id = ""
+        # for vendor_language in vendor_languages:
+        #     commit_hash = get_commit_hash(vendor_language)
+        #     if commit_hash:
+        #         build_id += commit_hash
+        #     else:
+        #         build_id += "ERROR"
+        # build_id_file = os.path.join(clone_directory, "build_id")
+        #
+        # # check if the build_id is the same as the one stored in the file
+        # # if not, rebuild the shared library
+        # if os.path.exists(build_id_file):
+        #     with open(build_id_file, "r") as f:
+        #         stored_build_id = f.read()
+        #     if build_id != stored_build_id:
+        #         os.remove(shared_languages)
+        # else:
+        #     if os.path.exists(shared_languages):
+        #         os.remove(shared_languages)
 
         self.language = Language.build_library(
             # Store the library in the `build` directory
@@ -73,6 +85,9 @@ class CustomParser:
         # GO_LANGUAGE = Language("build/my-languages.so", "go")
         # PHP_LANGUAGE = Language("build/my-languages.so", "php")
         # JAVASCRIPT_LANGUAGE = Language("build/my-languages.so", "javascript")
+
+        # with open(build_id_file, "w") as f:
+        #     f.write(build_id)
 
         self.language_map = {
             # "python": PYTHON_LANGUAGE,
