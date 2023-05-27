@@ -1,4 +1,4 @@
-from comex.tree_parser.custom_parser import CustomParser
+from ..tree_parser.custom_parser import CustomParser
 
 
 class CSParser(CustomParser):

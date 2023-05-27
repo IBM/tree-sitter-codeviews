@@ -5,8 +5,8 @@ import pprint
 
 import networkx as nx
 
-from comex.utils.src_parser import traverse_tree
-from comex.utils.cs_nodes import statement_types
+from ...utils.src_parser import traverse_tree
+from ...utils.cs_nodes import statement_types
 from deepdiff import DeepDiff
 
 from loguru import logger

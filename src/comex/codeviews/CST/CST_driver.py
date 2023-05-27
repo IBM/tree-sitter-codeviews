@@ -1,7 +1,7 @@
 import os
 
 import networkx as nx
-from comex.tree_parser.parser_driver import ParserDriver
+from ...tree_parser.parser_driver import ParserDriver
 
 
 class CSTGraph:
