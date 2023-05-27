@@ -1,6 +1,6 @@
-from comex.tree_parser.java_parser import JavaParser
-from comex.tree_parser.cs_parser import CSParser
-from comex.utils import preprocessor
+from ..tree_parser.java_parser import JavaParser
+from ..tree_parser.cs_parser import CSParser
+from ..utils import preprocessor
 
 
 class ParserDriver:

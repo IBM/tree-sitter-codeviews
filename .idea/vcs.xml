@@ -2,5 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/comex/vendor/tree-sitter-c-sharp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/comex/vendor/tree-sitter-java" vcs="Git" />
   </component>
 </project>

@@ -1,8 +1,8 @@
 # from codeviews.CFG.CFG_python import CFGGraph_python
-from comex.codeviews.CFG.CFG_csharp import CFGGraph_csharp
-from comex.codeviews.CFG.CFG_java import CFGGraph_java
-from comex.tree_parser.parser_driver import ParserDriver
-from comex.utils import postprocessor
+from .CFG_csharp import CFGGraph_csharp
+from .CFG_java import CFGGraph_java
+from ...tree_parser.parser_driver import ParserDriver
+from ...utils import postprocessor
 
 
 class CFGDriver:
