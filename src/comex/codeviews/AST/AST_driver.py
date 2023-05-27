@@ -1,6 +1,6 @@
-from comex.codeviews.AST.AST import ASTGraph
-from comex.tree_parser.parser_driver import ParserDriver
-from comex.utils import postprocessor
+from .AST import ASTGraph
+from ...tree_parser.parser_driver import ParserDriver
+from ...utils import postprocessor
 
 
 class ASTDriver:

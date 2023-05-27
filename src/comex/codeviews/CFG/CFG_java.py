@@ -1,7 +1,7 @@
 import traceback
 import networkx as nx
-from comex.codeviews.CFG.CFG import CFGGraph
-from comex.utils import java_nodes
+from .CFG import CFGGraph
+from ...utils import java_nodes
 from loguru import logger
 
 class CFGGraph_java(CFGGraph):

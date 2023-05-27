@@ -3,8 +3,8 @@ import traceback
 import networkx as nx
 from loguru import logger
 
-from comex.codeviews.CFG.CFG import CFGGraph
-from comex.utils import cs_nodes
+from .CFG import CFGGraph
+from ...utils import cs_nodes
 
 
 def get_index(node, index):

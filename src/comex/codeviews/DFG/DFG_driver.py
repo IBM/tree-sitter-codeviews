@@ -1,6 +1,6 @@
-from comex.tree_parser.parser_driver import ParserDriver
-from comex.utils import postprocessor
-from comex.codeviews.SDFG.SDFG import DfgRda
+from ...tree_parser.parser_driver import ParserDriver
+from ...utils import postprocessor
+from ..SDFG.SDFG import DfgRda
 
 
 class DFGDriver:
