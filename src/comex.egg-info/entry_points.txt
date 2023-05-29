@@ -1,0 +1,2 @@
+[console_scripts]
+comex = comex.cli:app
