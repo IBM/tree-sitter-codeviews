@@ -4,4 +4,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="codebert" project-jdk-type="Python SDK" />
+  <component name="PythonCompatibilityInspectionAdvertiser">
+    <option name="version" value="3" />
+  </component>
 </project>
