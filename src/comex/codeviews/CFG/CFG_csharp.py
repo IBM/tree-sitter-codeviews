@@ -72,17 +72,16 @@ class CFGGraph_csharp(CFGGraph):
         self.CFG_node_list, self.CFG_edge_list = self.CFG_cs()
         self.graph = self.to_networkx(self.CFG_node_list, self.CFG_edge_list)
 
-   
     def get_index(self, node):
         return self.index[(node.start_point, node.end_point, node.type)]
-    
+
     def check_inner_class(self, node):
         while node.parent is not None:
             if node.parent.type == "class_declaration":
                 return True
             node = node.parent
         return False
-    
+
     def get_basic_blocks(self, CFG_node_list, CFG_edge_list):
         G = self.to_networkx(CFG_node_list, CFG_edge_list)
         components = nx.weakly_connected_components(G)
@@ -98,8 +97,8 @@ class CFGGraph_csharp(CFGGraph):
         for key, value in dictionary.items():
             if val in value:
                 return key
-            
-    #TODO: Check the correctness of this function
+
+    # TODO: Check the correctness of this function
     def get_containing_method(self, node):
         while node is not None:
             if node.type == 'lambda_expression':
@@ -151,18 +150,19 @@ class CFGGraph_csharp(CFGGraph):
                 self.records["return_statement_map"][current_containing_method].append(self.get_index(src_node))
             except:
                 self.records["return_statement_map"][current_containing_method] = [self.get_index(src_node)]
-            
+
         else:
             self.add_edge(self.get_index(src_node), self.get_index(dest_node), edge_type)
 
-    #TODO: Change all calls of get_next_index to match
+    # TODO: Change all calls of get_next_index to match
     def get_next_index(self, node_value):
         # If exiting a method, don't return
         next_node = node_value.next_named_sibling
-        #TODO: Check if "block" works or not
-        while next_node is not None and next_node.type == "block" and len(list(filter(lambda child : child.is_named, next_node.children))) == 0:
+        # TODO: Check if "block" works or not
+        while next_node is not None and next_node.type == "block" and len(
+                list(filter(lambda child: child.is_named, next_node.children))) == 0:
             next_node = next_node.next_named_sibling
-        #TODO: Check if check_inner_class works properly or not)
+        # TODO: Check if check_inner_class works properly or not)
         if next_node is not None and next_node.type == "class_declaration":
             # Check if its a local class
             if self.check_inner_class(node_value):
@@ -217,7 +217,7 @@ class CFGGraph_csharp(CFGGraph):
             return 2, None
         if next_node.type in self.statement_types["definition_types"]:
             return 2, None
-        
+
         # if next_node.type == "block":
         #     for child in next_node.children:
         #         if child.is_named:
@@ -242,14 +242,14 @@ class CFGGraph_csharp(CFGGraph):
                 return 2, None
             else:
                 return (self.get_index(next_node), next_node)
-        
+
         except Exception as e:
             # return 2, None
             print("DO NOT IGNORE", e)
             logger.warning(traceback.format_stack()[-2])
             raise NotImplementedError
             return next_node_index, next_node
-        
+
     def edge_first_line(self, current_node_key, current_node_value):
         # We need to add an edge to the first statement in the next basic block
         node_index = self.index[current_node_key]
@@ -365,8 +365,9 @@ class CFGGraph_csharp(CFGGraph):
         #     self.index[(block_node.start_point, block_node.end_point, block_node.type)],
         #     block_node.type,
         # )
-    #TODO: Check correctness of the next 3 functions
-    def get_class_name(self,node):
+
+    # TODO: Check correctness of the next 3 functions
+    def get_class_name(self, node):
         reference_node = node.child_by_field_name("object")
         types = ["scoped_type_identifier", "type_identifier", "generic_type"]
 
@@ -389,7 +390,7 @@ class CFGGraph_csharp(CFGGraph):
             class_name = [self.symbol_table["data_type"][declaration_index]]
             try:
                 class_name += self.records['extends'][class_name[0]]
-                
+
             except:
                 pass
             return class_name
@@ -407,9 +408,10 @@ class CFGGraph_csharp(CFGGraph):
                 except:
                     pass
                 return class_name
-        
+
             return None
-    def get_return_type(self,current_node):
+
+    def get_return_type(self, current_node):
         method_name = current_node.child_by_field_name("name").text.decode("UTF-8")
         class_name = self.get_class_name(current_node)
         if class_name is not None:
@@ -419,7 +421,7 @@ class CFGGraph_csharp(CFGGraph):
             method_name = (None, method_name)
         signature = ()
         argument_list = current_node.child_by_field_name("arguments")
-        argument_list = list(filter(lambda child : child.is_named, argument_list.children))
+        argument_list = list(filter(lambda child: child.is_named, argument_list.children))
         signature = self.get_signature(argument_list)
         function_key = (method_name, signature)
         try:
@@ -427,15 +429,15 @@ class CFGGraph_csharp(CFGGraph):
         except:
             data_type = "void"
         # records["return_type"][((class_name,method_name), signature)] = return_type
-        return data_type 
-    
+        return data_type
+
     def get_signature(self, argument_list):
         literal_type_map = {
             "character_literal": "char",
             "string_literal": "String",
             "decimal_integer_literal": "int",
             "boolean": "boolean",
-            "decimal_floating_point_literal": "double", # If float, won't work
+            "decimal_floating_point_literal": "double",  # If float, won't work
         }
         signature = []
         for argument in argument_list:
@@ -470,7 +472,7 @@ class CFGGraph_csharp(CFGGraph):
                 except:
                     signature.append("Unknown")
         return tuple(signature)
-    
+
     # def function_list(self, current_node):
     #     if current_node.type == "method_invocation":
     #         # maintain a list of all method invocations
@@ -533,14 +535,15 @@ class CFGGraph_csharp(CFGGraph):
     #     for child in current_node.children:
     #         if child.is_named:
     #             self.function_list(child)
-    #TODO: Check correctness nd function calls to this
+    # TODO: Check correctness nd function calls to this
     def function_list(self, current_node, node_list):
         current_index = self.get_index(current_node)
         if current_node.type == "method_invocation":
             parent_node = None
             pointer_node = current_node
             while pointer_node is not None:
-                if (pointer_node.parent is not None and pointer_node.parent.type in self.statement_types["node_list_type"]):
+                if (pointer_node.parent is not None and pointer_node.parent.type in self.statement_types[
+                    "node_list_type"]):
                     try:
                         p = pointer_node.parent
                         parent_node = node_list[(p.start_point, p.end_point, p.type)]
@@ -554,7 +557,7 @@ class CFGGraph_csharp(CFGGraph):
             base_method_name = current_node.child_by_field_name("name").text.decode("UTF-8")
             signature = ()
             argument_list = current_node.child_by_field_name("arguments")
-            argument_list = list(filter(lambda child : child.is_named, argument_list.children))
+            argument_list = list(filter(lambda child: child.is_named, argument_list.children))
             signature = self.get_signature(argument_list)
 
             class_name_list = self.get_class_name(current_node)
@@ -565,7 +568,7 @@ class CFGGraph_csharp(CFGGraph):
                     if function_key in self.records["function_calls"].keys():
                         self.records["function_calls"][function_key].append((current_index, parent_index))
                     else:
-                        self.records["function_calls"][function_key] = [(current_index,parent_index)]
+                        self.records["function_calls"][function_key] = [(current_index, parent_index)]
             else:
                 for class_name in class_name_list:
                     method_name = (class_name, base_method_name)
@@ -574,12 +577,13 @@ class CFGGraph_csharp(CFGGraph):
                         if function_key in self.records["function_calls"].keys():
                             self.records["function_calls"][function_key].append((current_index, parent_index))
                         else:
-                            self.records["function_calls"][function_key] = [(current_index,parent_index)]
+                            self.records["function_calls"][function_key] = [(current_index, parent_index)]
         elif current_node.type == "object_creation_expression":
             parent_node = None
             pointer_node = current_node
             while pointer_node is not None:
-                if (pointer_node.parent is not None and pointer_node.parent.type in self.statement_types["node_list_type"]):
+                if (pointer_node.parent is not None and pointer_node.parent.type in self.statement_types[
+                    "node_list_type"]):
                     try:
                         p = pointer_node.parent
                         parent_node = node_list[(p.start_point, p.end_point, p.type)]
@@ -593,14 +597,14 @@ class CFGGraph_csharp(CFGGraph):
             # type_name = type_name[0].text.decode("utf-8")
             type_name = current_node.child_by_field_name("type").text.decode("utf-8")
             try:
-                self.records["object_instantiate"][type_name].append((current_index,parent_index))
+                self.records["object_instantiate"][type_name].append((current_index, parent_index))
             except:
-                self.records["object_instantiate"][type_name] = [(current_index,parent_index)]
-                    # break
+                self.records["object_instantiate"][type_name] = [(current_index, parent_index)]
+                # break
             signature = ()
             argument_list = current_node.child_by_field_name("arguments")
             try:
-                argument_list = list(filter(lambda child : child.is_named, argument_list.children))
+                argument_list = list(filter(lambda child: child.is_named, argument_list.children))
             except:
                 argument_list = []
             signature = self.get_signature(argument_list)
@@ -609,38 +613,38 @@ class CFGGraph_csharp(CFGGraph):
             if function_key in self.records["constructor_calls"].keys():
                 self.records["constructor_calls"][function_key].append((current_index, parent_index))
             else:
-                self.records["constructor_calls"][function_key] = [(current_index,parent_index)]
+                self.records["constructor_calls"][function_key] = [(current_index, parent_index)]
 
-        elif  current_node.type == "explicit_constructor_invocation":
+        elif current_node.type == "explicit_constructor_invocation":
             parent_node = current_node
             parent_index = self.get_index(parent_node)
             type_name = current_node.child_by_field_name("constructor").text.decode("utf-8")
-            if type_name == 'this': # TODO: Add super also here for now
+            if type_name == 'this':  # TODO: Add super also here for now
                 type_name_list = self.get_class_name(current_node)
                 for type_name in type_name_list:
                     # TODO: Replace this condition with a method level check flag
                     if type_name != "test":
                         try:
-                            self.records["object_instantiate"][type_name].append((current_index,current_index))
+                            self.records["object_instantiate"][type_name].append((current_index, current_index))
                         except:
-                            self.records["object_instantiate"][type_name] = [(current_index,current_index)]
+                            self.records["object_instantiate"][type_name] = [(current_index, current_index)]
 
                         signature = ()
                         argument_list = current_node.child_by_field_name("arguments")
-                        argument_list = list(filter(lambda child : child.is_named, argument_list.children))
+                        argument_list = list(filter(lambda child: child.is_named, argument_list.children))
                         signature = self.get_signature(argument_list)
                         method_name = (type_name, type_name)
                         function_key = (method_name, signature)
                         if function_key in self.records["constructor_calls"].keys():
                             self.records["constructor_calls"][function_key].append((current_index, parent_index))
                         else:
-                            self.records["constructor_calls"][function_key] = [(current_index,parent_index)]
-            
+                            self.records["constructor_calls"][function_key] = [(current_index, parent_index)]
+
             elif type_name == 'super':
                 pass
             else:
                 raise Exception("Explicit constructor invocation not handled")
-           
+
         elif current_node.type == "method_declaration" or current_node.type == "constructor_declaration":
             last_line, _ = self.get_block_last_line(current_node, "body")
             try:
@@ -657,7 +661,9 @@ class CFGGraph_csharp(CFGGraph):
             empty_flag = True
             last_statement = None
             class_node = current_node.child_by_field_name("body")
-            class_children = list(filter(lambda child: child.is_named and child.type != "method_declaration" and child.type != "class_declaration", class_node.children))
+            class_children = list(filter(lambda
+                                             child: child.is_named and child.type != "method_declaration" and child.type != "class_declaration",
+                                         class_node.children))
             for child in reversed(class_children):
                 if child.type in self.statement_types["node_list_type"]:
                     empty_flag = False
@@ -694,7 +700,8 @@ class CFGGraph_csharp(CFGGraph):
         for child in current_node.children:
             if child.is_named:
                 self.function_list(child, node_list)
-    #TODO: Check correctness
+
+    # TODO: Check correctness
     def get_all_statements(self, current_node, node_list, statements):
         for child in current_node.children:
             if child.is_named and child.type in self.statement_types["node_list_type"]:
@@ -702,8 +709,8 @@ class CFGGraph_csharp(CFGGraph):
                 if child_key in node_list.keys():
                     statements.append(child)
             self.get_all_statements(child, node_list, statements)
-        return statements      
-          
+        return statements
+
     def add_dummy_nodes(self):
         self.CFG_node_list.append((1, 0, "start_node", "start"))
         # self.CFG_node_list.append((2, 0, "exit_node", "exit"))
@@ -725,7 +732,7 @@ class CFGGraph_csharp(CFGGraph):
         signature = []
         formal_parameters = node.child_by_field_name('parameters')
         formal_parameters = list(filter(lambda x: x.type == 'formal_parameter', formal_parameters.children))
-        
+
         for formal_parameter in formal_parameters:
             for child in formal_parameter.children:
                 if child.type != "identifier":
@@ -748,8 +755,8 @@ class CFGGraph_csharp(CFGGraph):
                 class_name = list(filter(lambda child: child.type in type_identifiers, node.children))[0]
                 return class_index, class_name.text.decode("UTF-8")
             node = node.parent
-    
-    def inner_function(self,current_node):
+
+    def inner_function(self, current_node):
         """Returns true if the current node is inside an inner function"""
         method_counter = 0
         while current_node is not None:
@@ -760,8 +767,9 @@ class CFGGraph_csharp(CFGGraph):
             return True
         else:
             return False
+
     def returns_inner_definition(self, node, inner_node):
-        
+
         """Returns the inner definition index if exists"""
         for c in node.children:
             if c.is_named and c.type == "method_declaration":
@@ -769,12 +777,12 @@ class CFGGraph_csharp(CFGGraph):
                 _, class_name = self.get_class_name_nodes(c)
                 signature = self.get_signature_nodes(c)
                 # TODO: Take out the common unitility functions like get class name and signture
-                inner_node.append(self.records["method_list"][((class_name,method_name), signature)])
+                inner_node.append(self.records["method_list"][((class_name, method_name), signature)])
                 return
             else:
                 self.returns_inner_definition(c, inner_node)
         return
-    
+
     def get_matched_constructor(self, node):
         for node_signature, node_ind in self.records["constructor_calls"].items():
             for node_search in node_ind:
@@ -782,7 +790,7 @@ class CFGGraph_csharp(CFGGraph):
                     if node_signature in self.records["constructor_list"].keys():
                         method_index = self.records["constructor_list"][node_signature]
                         return method_index
-                           
+
         for node_signature, node_ind in self.records["constructor_calls"].items():
             for node_search in node_ind:
                 flag = False
@@ -795,11 +803,13 @@ class CFGGraph_csharp(CFGGraph):
                             flag = False
                         else:
                             for i in range(len(list_signature_list)):
-                                if list_signature_list[i] != "Unknown" and node_signature_list[i] != "Unknown" and list_signature_list[i] != node_signature_list[i]:
+                                if list_signature_list[i] != "Unknown" and node_signature_list[i] != "Unknown" and \
+                                        list_signature_list[i] != node_signature_list[i]:
                                     flag = False
                                     break
                         if flag == True:
                             return list_index
+
     def add_method_call_edges(self):
         # print("Method List")
         # print(*self.records["method_list"].items(), sep="\n")
@@ -831,7 +841,7 @@ class CFGGraph_csharp(CFGGraph):
                 if node_signature in self.records["method_list"].keys():
                     method_index = self.records["method_list"][node_signature]
                     # Find the class name before indexing records["method_list"]
-                    edge_type = "method_call|"+str(node[0])
+                    edge_type = "method_call|" + str(node[0])
                     self.add_edge(node[1], self.records["method_list"][node_signature], edge_type)
                     # Add the returning edge
                     # Use the return statement index available in records. And add an edge from all the return statements to the calling line here
@@ -846,7 +856,7 @@ class CFGGraph_csharp(CFGGraph):
             for node in node_index:
                 if node_name in self.records["class_list"].keys():
                     class_index = self.records["class_list"][node_name]
-                    edge_type = "constructor_call|"+str(node[0])
+                    edge_type = "constructor_call|" + str(node[0])
                     additional_data_index = self.get_matched_constructor(node)
                     additional_data = {}
                     if additional_data_index is not None:
@@ -883,7 +893,7 @@ class CFGGraph_csharp(CFGGraph):
                         # If you can't find return statements, then add an edge from the last line 
                         # Handled by adding the last line to the return statement map in self.function_calls
                         pass
-                   
+
         # for lambda expressions
         # for node_key, lambda_expression in self.records["lambda_map"].items():
         for lambda_key, statement_node in self.records["lambda_map"].items():
@@ -891,35 +901,36 @@ class CFGGraph_csharp(CFGGraph):
             lambda_index = self.index[lambda_key]
             # self.edge_to_body(node_key, lambda_expression, "body", "lambda_invocation")
             self.add_edge(self.get_index(statement_node), lambda_index, "lambda_invocation")
-            #TODO: maintain a return map for all points of return
+            # TODO: maintain a return map for all points of return
             try:
                 for return_node in self.records["return_statement_map"][lambda_index]:
                     self.add_edge(return_node, self.get_index(statement_node), "lambda_return 1")
             except:
                 pass
                 for lambda_expression in self.get_all_lambda_body(statement_node):
-                # Note: Might need to move this to before the try
+                    # Note: Might need to move this to before the try
                     last_line, line_type = self.get_block_last_line(lambda_expression, "body")
                     if line_type not in self.statement_types['node_list_type']:
-                        self.add_edge(self.get_index(lambda_expression), self.get_index(statement_node), "lambda_return 2")
+                        self.add_edge(self.get_index(lambda_expression), self.get_index(statement_node),
+                                      "lambda_return 2")
                     else:
                         last_line_index = self.get_index(last_line)
                         self.add_edge(last_line_index, self.get_index(statement_node), "lambda_return 3")
-            
-    def return_next_node(self,node_value):
+
+    def return_next_node(self, node_value):
         # node_value = node_value.parent  
         next_node = node_value.next_named_sibling
         while next_node is None and node_value.parent.type in self.statement_types['statement_holders']:
-            if node_value.parent.parent.type == 'method_declaration':         
+            if node_value.parent.parent.type == 'method_declaration':
                 next_node = node_value.parent.next_named_sibling
                 return next_node
             else:
                 node_value = node_value.parent
-                next_node = node_value.next_named_sibling   
+                next_node = node_value.next_named_sibling
         if node_value.parent.type in self.statement_types['statement_holders']:
             return next_node
         return None
-    
+
     def add_class_edge(self, node_value):
         class_attributes = ["field_declaration", "static_initializer"]
         # Not included: ["record_declaration", "method_declaration","compact_constructor_declaration","class_declaration","interface_declaration","annotation_type_declaration","enum_declaration","block","static_initializer","constructor_declaration"]
@@ -931,12 +942,12 @@ class CFGGraph_csharp(CFGGraph):
         for field in current_fields:
             if field.type == "static_initializer":
                 # Find the first line insdie the block
-                block = list(filter(lambda x : x.type == "block", field.children))[0]
+                block = list(filter(lambda x: x.type == "block", field.children))[0]
                 try:
-                    field = list(filter(lambda x : x.is_named, block.children))[-1]
+                    field = list(filter(lambda x: x.is_named, block.children))[-1]
                 except:
                     continue
-                field_index = self.get_index(field)    
+                field_index = self.get_index(field)
             else:
                 field_index = self.get_index(field)
                 self.add_edge(current_index, field_index, "class_next")
@@ -952,7 +963,7 @@ class CFGGraph_csharp(CFGGraph):
         try:
             methods = list(filter(lambda x: x.type == "method_declaration", current_node.children))
             for method in methods:
-                if self.records["main_method"] == self.get_index(method): 
+                if self.records["main_method"] == self.get_index(method):
                     self.add_edge(current_index, self.records["main_method"], "main_method_next")
         except:
             pass
@@ -983,15 +994,16 @@ class CFGGraph_csharp(CFGGraph):
         # Initial for loop required for basic block creation and simple control flow within a block ----------------------------
         for node_key, node_value in node_list.items():
             current_node_type = node_key[2]
-            if current_node_type in self.statement_types["non_control_statement"] and current_node_type not in self.statement_types["scope_only_blocks"]:
+            if current_node_type in self.statement_types["non_control_statement"] and current_node_type not in \
+                    self.statement_types["scope_only_blocks"]:
                 # if current_node_type not in self.statement_types['terminal_inner']:
                 if (
-                    cs_nodes.return_switch_child(node_value) is None
-                    and node_value.parent is not None
-                    and node_value.parent.type
-                    in self.statement_types["statement_holders"]
+                        cs_nodes.return_switch_child(node_value) is None
+                        and node_value.parent is not None
+                        and node_value.parent.type
+                        in self.statement_types["statement_holders"]
                 ):
-                # if cs_nodes.return_switch_child(node_value) is None:
+                    # if cs_nodes.return_switch_child(node_value) is None:
                     try:
                         print("_________________-")
                         print(node_value.text.decode("utf-8"), node_value.type)
@@ -1005,11 +1017,12 @@ class CFGGraph_csharp(CFGGraph):
                         next_node = node_value.next_named_sibling
                         if next_node is not None and next_node.type == "static_initializer":
                             try:
-                                child = list(filter(lambda x : x.type == "block", next_node.children))[0]
+                                child = list(filter(lambda x: x.type == "block", next_node.children))[0]
                                 next_node = child
                             except:
                                 pass
-                        while next_node is not None and next_node.type == "block" and len(list(filter(lambda child : child.is_named, next_node.children))) == 0:
+                        while next_node is not None and next_node.type == "block" and len(
+                                list(filter(lambda child: child.is_named, next_node.children))) == 0:
                             next_node = next_node.next_named_sibling
                         # If it is a local class, skip it and go for the next node
                         if next_node is not None and next_node.type == "class_declaration":
@@ -1021,9 +1034,12 @@ class CFGGraph_csharp(CFGGraph):
                         #     self.handle_next(node_value, None, "constructor_return")
                         if next_node is None and node_value.parent.type == 'block':
                             next_node = self.return_next_node(node_value)
+                            if next_node is None:
+                                continue
                             dest_node = self.get_index(next_node)
                             check = True
-                            if next_node.type in self.statement_types["node_list_type"] and next_node.type not in self.statement_types["definition_types"]:
+                            if next_node.type in self.statement_types["node_list_type"] and next_node.type not in \
+                                    self.statement_types["definition_types"]:
                                 self.add_edge(src_node, dest_node, "next_line $")
 
                         flag = False
@@ -1040,12 +1056,12 @@ class CFGGraph_csharp(CFGGraph):
 
                             if flag == True:
                                 break
-                        
-                        
+
                         dest_node = self.get_index(next_node)
                         if dest_node in self.records["switch_child_map"].keys():
                             dest_node = self.records["switch_child_map"][dest_node]
-                        if check is False and next_node.type in self.statement_types['node_list_type'] and next_node.type not in self.statement_types["definition_types"]:
+                        if check is False and next_node.type in self.statement_types[
+                            'node_list_type'] and next_node.type not in self.statement_types["definition_types"]:
                             self.add_edge(src_node, dest_node, "next_line 1")
                         # if next_node and next_node.type == "block":
                         #     for child in next_node.children:
@@ -1084,6 +1100,7 @@ class CFGGraph_csharp(CFGGraph):
                         #                 next_node = None
                     except Exception as e:
                         print("EXCEPTION: ", e)
+                        print(traceback.format_exc())
                         pass
 
             elif current_node_type in self.statement_types["not_implemented"]:
@@ -1127,12 +1144,12 @@ class CFGGraph_csharp(CFGGraph):
                         self.add_edge(1, current_index, "next")
 
                 self.edge_first_line(node_key, node_value)
-                #TODO: Change all occurences of get_block_last_line
+                # TODO: Change all occurences of get_block_last_line
                 last_line, line_type = self.get_block_last_line(
                     node_value, "body"
                 )
                 last_line_index = self.get_index(last_line)
-                try: 
+                try:
                     if current_case_index == self.records["main_method"]:
                         if line_type in self.statement_types["non_control_statement"]:
                             if last_line_index in self.records["switch_child_map"].keys():
@@ -1141,7 +1158,7 @@ class CFGGraph_csharp(CFGGraph):
                 except:
                     # No main method in this snippet
                     pass
-                #TODO: Not sure if this part makes sense
+                # TODO: Not sure if this part makes sense
                 if line_type in self.statement_types["non_control_statement"]:
                     if last_line_index in self.records["switch_child_map"].keys():
                         last_line_index = self.records["switch_child_map"][
@@ -1158,7 +1175,7 @@ class CFGGraph_csharp(CFGGraph):
             # ------------------------------------------------------------------------------------------------
             elif current_node_type == "interface_declaration":
                 self.edge_first_line(node_key, node_value)
-            #------------------------------------------------------------------------------
+            # ------------------------------------------------------------------------------
             if current_node_type == "class_declaration":
                 self.add_class_edge(node_value)
             elif current_node_type == "import_declaration":
@@ -1197,7 +1214,8 @@ class CFGGraph_csharp(CFGGraph):
                 )
                 last_line_index = self.get_index(last_line)
                 next_dest_index, next_node = self.get_next_index(node_value)
-                if line_type in self.statement_types["non_control_statement"] and line_type not in self.statement_types["scope_only_blocks"]:
+                if line_type in self.statement_types["non_control_statement"] and line_type not in self.statement_types[
+                    "scope_only_blocks"]:
                     self.handle_next(last_line, next_node, "next_line *")
                     # self.add_edge(
                     #     last_line_index,
@@ -1228,7 +1246,7 @@ class CFGGraph_csharp(CFGGraph):
                 # Also add an edge from the last guy to the next statement after the if
                 # print(last_line_index, line_type)
                 if line_type in self.statement_types["non_control_statement"]:
-                   self.handle_next(last_line, next_node, "next_line")
+                    self.handle_next(last_line, next_node, "next_line")
 
                 # alternative = node_value.child_by_field_name('alternative')
                 # print("alternative", alternative)
@@ -1637,9 +1655,9 @@ class CFGGraph_csharp(CFGGraph):
                 # method_list will give us the index of the inner function
                 inner_definition = []
                 self.returns_inner_definition(node_value, inner_definition)
-                
+
                 if len(inner_definition) > 0:
-                    inner_definition = inner_definition[0] 
+                    inner_definition = inner_definition[0]
                     # inner_index = self.index[(inner_definition.start_point, inner_definition.end_point, inner_definition.type)]
                     # TODOD: Perhaps remove this because inconsistent wih newly decided logic
                     self.add_edge(current_index, inner_definition, "return_next")
@@ -1649,7 +1667,7 @@ class CFGGraph_csharp(CFGGraph):
                     # Instead of an edge to exit node, we update the return map
                     # self.add_edge(current_index, 2, "return_exit")
                     containing_method = self.get_index(self.get_containing_method(node_value))
-                    
+
                     try:
                         self.records["return_statement_map"][containing_method].append(current_index)
                     except:
