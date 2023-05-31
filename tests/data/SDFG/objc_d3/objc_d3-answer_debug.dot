@@ -11,11 +11,11 @@ digraph  {
 94 [label="10_\ int\ j\ =\ br2\.attribute1\.method2\(3,4\)\ ;", type_label=local_declaration];
 1 [label="1_\ start_node", type_label=start];
 10 -> 21  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label="{args,1,0|1}"];
-21 -> 38  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br,2,0|1|2},{args,1,0|1}"];
-38 -> 47  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{str,3,0|1|2},{br,2,0|1|2},{args,1,0|1}"];
-47 -> 58  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br,2,0|1|2},{args,1,0|1},{br.attribute2,4,0|1|2,()},{str,4,0|1|2}"];
-58 -> 67  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br,2,0|1|2},{br.attribute2,4,0|1|2,()},{args,1,0|1},{br.attribute1,5,0|1|2},{str,4,0|1|2}"];
-67 -> 81  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br,6,0|1|2,()},{br.attribute2,4,0|1|2,()},{args,1,0|1},{br.attribute1,5,0|1|2},{str,4,0|1|2}"];
-81 -> 88  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br2,7,0|1|2},{br,6,0|1|2,()},{br.attribute2,4,0|1|2,()},{args,1,0|1},{br.attribute1,5,0|1|2},{str,4,0|1|2}"];
-88 -> 94  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br2,7,0|1|2},{br.attribute2,4,0|1|2,()},{br,8,0|1|2,()},{args,1,0|1},{br.attribute1,5,0|1|2},{str,4,0|1|2}"];
+21 -> 38  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{args,1,0|1},{br,2,0|1|2}"];
+38 -> 47  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{args,1,0|1},{str,3,0|1|2},{br,2,0|1|2}"];
+47 -> 58  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{str,4,0|1|2},{args,1,0|1},{br.attribute2,4,0|1|2,()},{br,2,0|1|2}"];
+58 -> 67  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{str,4,0|1|2},{args,1,0|1},{br.attribute1,5,0|1|2},{br.attribute2,4,0|1|2,()},{br,2,0|1|2}"];
+67 -> 81  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br,6,0|1|2,()},{str,4,0|1|2},{args,1,0|1},{br.attribute1,5,0|1|2},{br.attribute2,4,0|1|2,()}"];
+81 -> 88  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br2,7,0|1|2},{br,6,0|1|2,()},{str,4,0|1|2},{args,1,0|1},{br.attribute1,5,0|1|2},{br.attribute2,4,0|1|2,()}"];
+88 -> 94  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br,8,0|1|2,()},{br2,7,0|1|2},{str,4,0|1|2},{args,1,0|1},{br.attribute1,5,0|1|2},{br.attribute2,4,0|1|2,()}"];
 }

@@ -11,11 +11,11 @@ from comex.utils import postprocessor, DFG_utils
 
 debug = False
 
-if any(
-        # GITHUB_ACTIONS
-        x in os.environ for x in ("PYCHARM_HOSTED",)
-):
-    debug = True
+# if any(
+#         # GITHUB_ACTIONS
+#         x in os.environ for x in ("PYCHARM_HOSTED",)
+# ):
+#     debug = True
 
 
 class DfgRda:

@@ -9,11 +9,11 @@ digraph  {
 63 [label="9_\ long\ lmask\ =\ parseIpAddressToLong\(mask\);", type_label=expression_statement];
 71 [label="10_\ return\ \(lhost\ \&\ lmask\)\ ==\ lpattern;", type_label=return];
 1 [label="1_\ start_node", type_label=start];
-10 -> 25  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label="{pattern,1,0},{mask,1,0},{host,1,0}"];
-25 -> 32  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{pattern,1,0},{mask,1,0},{host,2,0|1}"];
-32 -> 45  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{host,3,0|1,()},{pattern,1,0},{mask,1,0}"];
-32 -> 47  [color=red, controlflow_type="next_line 6", edge_type=CFG_edge, key=0, label="{host,3,0|1,()},{pattern,1,0},{mask,1,0}"];
-47 -> 55  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{host,3,0|1,()},{pattern,1,0},{mask,1,0},{lhost,6,0}"];
-55 -> 63  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{pattern,1,0},{lhost,6,0},{mask,1,0},{host,3,0|1,()},{lpattern,7,0}"];
-63 -> 71  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{pattern,1,0},{lmask,8,0},{lhost,6,0},{mask,1,0},{host,3,0|1,()},{lpattern,7,0}"];
+10 -> 25  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label="{pattern,1,0},{host,1,0},{mask,1,0}"];
+25 -> 32  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{pattern,1,0},{host,2,0|1},{mask,1,0}"];
+32 -> 45  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{pattern,1,0},{host,3,0|1,()},{mask,1,0}"];
+32 -> 47  [color=red, controlflow_type="next_line 6", edge_type=CFG_edge, key=0, label="{pattern,1,0},{host,3,0|1,()},{mask,1,0}"];
+47 -> 55  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{pattern,1,0},{host,3,0|1,()},{lhost,6,0},{mask,1,0}"];
+55 -> 63  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{pattern,1,0},{lhost,6,0},{host,3,0|1,()},{mask,1,0},{lpattern,7,0}"];
+63 -> 71  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{pattern,1,0},{lhost,6,0},{host,3,0|1,()},{mask,1,0},{lpattern,7,0},{lmask,8,0}"];
 }

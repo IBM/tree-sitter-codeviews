@@ -24,8 +24,12 @@ digraph  {
 48 -> 48  [key=0, used_def=i];
 48 -> 69  [color=green, key=0];
 53 -> 66  [color=green, key=0];
+53 -> 69  [color=green, key=0];
 63 -> 41  [color=orange, key=0];
 63 -> 53  [key=0, used_def=j];
 63 -> 63  [key=0, used_def=j];
 63 -> 66  [color=green, key=0];
+63 -> 69  [color=green, key=0];
+66 -> 69  [color=green, key=0];
+69 -> 66  [color=green, key=0];
 }

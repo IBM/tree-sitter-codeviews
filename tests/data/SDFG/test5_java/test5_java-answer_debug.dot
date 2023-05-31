@@ -15,16 +15,16 @@ digraph  {
 1 [label="1_\ start_node", type_label=start];
 9 -> 20  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label="{args,3,0}"];
 20 -> 24  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{topic,6,0},{args,3,0}"];
-24 -> 28  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{category,7,0},{topic,6,0},{args,3,0}"];
+24 -> 28  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{topic,6,0},{category,7,0},{args,3,0}"];
 28 -> 32  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{category,7,0},{topic,10,0|1|2},{args,3,0}"];
-32 -> 64  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{category,7,0},{args,3,0},{topic,10,0|1|2}"];
-32 -> 68  [color=red, controlflow_type=neg_next, edge_type=CFG_edge, key=0, label="{category,7,0},{args,3,0},{topic,10,0|1|2}"];
-64 -> 145  [color=red, controlflow_type="next_line 2", edge_type=CFG_edge, key=0, label="{args,3,0},{category,17,0|1|2},{topic,10,0|1|2}"];
-68 -> 100  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{category,7,0},{args,3,0},{topic,10,0|1|2}"];
-68 -> 104  [color=red, controlflow_type=neg_next, edge_type=CFG_edge, key=0, label="{category,7,0},{args,3,0},{topic,10,0|1|2}"];
-100 -> 145  [color=red, controlflow_type="next_line 2", edge_type=CFG_edge, key=0, label="{args,3,0},{category,25,0|1|2},{topic,10,0|1|2}"];
-104 -> 136  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{category,7,0},{args,3,0},{topic,10,0|1|2}"];
-104 -> 141  [color=red, controlflow_type=neg_next, edge_type=CFG_edge, key=0, label="{category,7,0},{args,3,0},{topic,10,0|1|2}"];
-136 -> 145  [color=red, controlflow_type="next_line 2", edge_type=CFG_edge, key=0, label="{args,3,0},{category,33,0|1|2},{topic,10,0|1|2}"];
-141 -> 145  [color=red, controlflow_type="next_line 4", edge_type=CFG_edge, key=0, label="{args,3,0},{category,38,0|1|2},{topic,10,0|1|2}"];
+32 -> 64  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{category,7,0},{topic,10,0|1|2},{args,3,0}"];
+32 -> 68  [color=red, controlflow_type=neg_next, edge_type=CFG_edge, key=0, label="{category,7,0},{topic,10,0|1|2},{args,3,0}"];
+64 -> 145  [color=red, controlflow_type="next_line 2", edge_type=CFG_edge, key=0, label="{category,17,0|1|2},{topic,10,0|1|2},{args,3,0}"];
+68 -> 100  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{category,7,0},{topic,10,0|1|2},{args,3,0}"];
+68 -> 104  [color=red, controlflow_type=neg_next, edge_type=CFG_edge, key=0, label="{category,7,0},{topic,10,0|1|2},{args,3,0}"];
+100 -> 145  [color=red, controlflow_type="next_line 2", edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,25,0|1|2},{args,3,0}"];
+104 -> 136  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{category,7,0},{topic,10,0|1|2},{args,3,0}"];
+104 -> 141  [color=red, controlflow_type=neg_next, edge_type=CFG_edge, key=0, label="{category,7,0},{topic,10,0|1|2},{args,3,0}"];
+136 -> 145  [color=red, controlflow_type="next_line 2", edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,33,0|1|2},{args,3,0}"];
+141 -> 145  [color=red, controlflow_type="next_line 4", edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,38,0|1|2},{args,3,0}"];
 }
