@@ -100,12 +100,14 @@ class CFGGraph_csharp(CFGGraph):
 
     # TODO: Check the correctness of this function
     def get_containing_method(self, node):
+        operator_declaration = ["operator_declaration", "conversion_operator_declaration"]
+        method_declaration = ["method_declaration", "constructor_declaration", "local_function_statement"]
         while node is not None:
             if node.type == 'lambda_expression':
                 return node
-            if node.type == "method_declaration" or node.type == "constructor_declaration":
+            if node.type in method_declaration:
                 return node
-            if node.type == "static_initializer":
+            if node.type == "accessor_list" or node.type in operator_declaration:
                 return node
             node = node.parent
         while node is not None:
@@ -128,16 +130,16 @@ class CFGGraph_csharp(CFGGraph):
                 dest_node,
             )
             logger.warning(traceback.format_stack()[-2])
-            print(src_node, dest_node, edge_type)
+            # print(src_node, dest_node, edge_type)
             raise NotImplementedError
         elif dest_node == 2:
-            print("Attempt to add exit node")
+            # print("Attempt to add exit node")
             return
         else:
             for src, dest, ty, *_ in self.CFG_edge_list:
                 if src == src_node and dest == dest_node:
                     return
-            print(src_node, dest_node, edge_type)
+            # print(src_node, dest_node, edge_type)
             self.CFG_edge_list.append((src_node, dest_node, edge_type, additional_data))
 
     def handle_next(self, src_node, dest_node, edge_type):
@@ -245,7 +247,7 @@ class CFGGraph_csharp(CFGGraph):
 
         except Exception as e:
             # return 2, None
-            print("DO NOT IGNORE", e)
+            # print("DO NOT IGNORE", e)
             logger.warning(traceback.format_stack()[-2])
             raise NotImplementedError
             return next_node_index, next_node
@@ -932,7 +934,7 @@ class CFGGraph_csharp(CFGGraph):
         return None
 
     def add_class_edge(self, node_value):
-        class_attributes = ["field_declaration", "static_initializer"]
+        class_attributes = ["field_declaration", "accessor_list"]
         # Not included: ["record_declaration", "method_declaration","compact_constructor_declaration","class_declaration","interface_declaration","annotation_type_declaration","enum_declaration","block","static_initializer","constructor_declaration"]
         current_index = self.get_index(node_value)
         current_node = node_value.child_by_field_name("body")
@@ -940,7 +942,7 @@ class CFGGraph_csharp(CFGGraph):
         # Chain all class level attributes together and append to class declaration.
         current_fields = list(filter(lambda x: x.type in class_attributes, current_node.children))
         for field in current_fields:
-            if field.type == "static_initializer":
+            if field.type == "accessor_list":
                 # Find the first line insdie the block
                 block = list(filter(lambda x: x.type == "block", field.children))[0]
                 try:
@@ -1005,8 +1007,8 @@ class CFGGraph_csharp(CFGGraph):
                 ):
                     # if cs_nodes.return_switch_child(node_value) is None:
                     try:
-                        print("_________________-")
-                        print(node_value.text.decode("utf-8"), node_value.type)
+                        # print("_________________-")
+                        # print(node_value.text.decode("utf-8"), node_value.type)
                         check = False
                         src_node = self.index[node_key]
                         if node_value.type == "labeled_statement":
@@ -1015,7 +1017,7 @@ class CFGGraph_csharp(CFGGraph):
                                     node_value.named_children[-1], self.index
                                 )
                         next_node = node_value.next_named_sibling
-                        if next_node is not None and next_node.type == "static_initializer":
+                        if next_node is not None and next_node.type == "accessor_list":
                             try:
                                 child = list(filter(lambda x: x.type == "block", next_node.children))[0]
                                 next_node = child
@@ -1099,8 +1101,8 @@ class CFGGraph_csharp(CFGGraph):
                         #                 # TODO Triage
                         #                 next_node = None
                     except Exception as e:
-                        print("EXCEPTION: ", e)
-                        print(traceback.format_exc())
+                        # print("EXCEPTION: ", e)
+                        # print(traceback.format_exc())
                         pass
 
             elif current_node_type in self.statement_types["not_implemented"]:
@@ -1138,8 +1140,9 @@ class CFGGraph_csharp(CFGGraph):
                         self.add_edge(1, self.records["main_class"], "next")
                         # self.add_edge(self.records["main_class"], current_index, "next")
                 except Exception as e:
-                    print("Exxxxxxx", e)
-                    if node_value.parent.parent.type == "class_declaration":
+                    # print("Exxxxxxx", e)
+                    declarations = ["class_declaration", "interface_declaration"]
+                    if node_value.type != "interface_declaration" and node_value.parent.parent.type in declarations:
                         # We need to add an edge to the first statement in the next basic block
                         self.add_edge(1, current_index, "next")
 
@@ -1467,10 +1470,7 @@ class CFGGraph_csharp(CFGGraph):
                     ]
                 except:
                     # Handle yield when no loop parent or switch parent
-                    next_dest_index, next_node = self.get_next_index(
-                        (node_value.start_point, node_value.end_point, node_value.type),
-                        node_value,
-                    )
+                    next_dest_index, next_node = self.get_next_index(node_value)
 
                 self.add_edge(current_index, next_dest_index, "yield_exit")
             # ------------------------------------------------------------------------------------------------
