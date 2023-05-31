@@ -58,7 +58,7 @@ statement_holders = [
 statement_types = {
     "node_list_type": non_control_statements
     + control_statements
-    + ["method_declaration"],
+    + ["method_declaration", "local_function_statement"],
     "scope_only_blocks": scope_only_blocks,
     "outer_node_type": ["for_statement"],
     "inner_node_type": inner_node_type,
@@ -70,7 +70,7 @@ statement_types = {
         # 'try_with_resources_statement'
     ],
     "statement_holders": statement_holders,
-    "definition_types": ["method_declaration", "constructor_declaration", "class_declaration", "field_declaration", "interface_declaration"]
+    "definition_types": ["method_declaration", "constructor_declaration", "class_declaration", "field_declaration", "interface_declaration", "operator_declaration", "conversion_operator_declaration"]
 }
 # TODO: add method_return_types
 method_return_types = ['integral_type', 'void_type', 'type_identifier', 'generic_type', 'scoped_type_identifier', 'floating_point_type', 'boolean_type', 'array_type']
@@ -313,7 +313,7 @@ def get_nodes(root_node=None, node_list={}, graph_node_list=[], index={}, record
                     signature = get_signature(root_node)
                     class_index, class_name_list = get_class_name(root_node, index)
                     if method_name == "Main":
-                        print("Main method found")
+                        # print("Main method found")
                         records["main_method"] = method_index
                         records["main_class"] = class_index
                     if abstract_method(root_node) == False:
@@ -333,7 +333,7 @@ def get_nodes(root_node=None, node_list={}, graph_node_list=[], index={}, record
                             records["return_type"][((class_name,method_name), signature)] = return_type
 
                 except Exception as e:
-                    print("*******", e)
+                    # print("*******", e)
                     pass
                 graph_node_list.append((method_index, root_node.start_point[0],label,type_label))
             elif (

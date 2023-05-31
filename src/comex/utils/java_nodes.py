@@ -335,7 +335,8 @@ def get_nodes(root_node=None, node_list={}, graph_node_list=[], index={}, record
                 try:
                     label = label.split("{")[0] + label.split("}")[-1]
                 except:
-                    print("INCORRECT anonymous class label", label)
+                    # print("INCORRECT anonymous class label", label)
+                    pass
             # elif check_lambda(root_node) and root_node.type not in statement_types["definition_types"]:
             elif check_lambda(root_node) and root_node.type not in statement_types["definition_types"]:
                 raw_label = root_node.text.decode("utf-8")
@@ -358,7 +359,7 @@ def get_nodes(root_node=None, node_list={}, graph_node_list=[], index={}, record
                         label = root_node.text.decode('utf-8')
                 except:
                     raise Exception("INCORRECT lambda expression label", label)
-                    print("INCORRECT lambda expression label", label)
+                    # print("INCORRECT lambda expression label", label)
 
             elif (root_node.type == "method_declaration" or root_node.type == "constructor_declaration"):
                 label = ""
