@@ -1,0 +1,35 @@
+digraph  {
+6 [label="1_\ public\ class\ Test\ ", type_label=class_declaration];
+10 [label="3_\ \ public\ ValueEval\ evaluate\ \(\\n\ \ \ \ \ \ int\ srcRowIndex,\\n\ \ \ \ \ \ int\ srcColumnIndex,\\n\ \ \ \ \ \ ValueEval\ arg0,\\n\ \ \ \ \ \ ValueEval\ arg1\\n\ \ \ \ \)", type_label=method_declaration];
+28 [label="9_\ try", type_label=try];
+30 [label="10_\ ValueEval\ ve\ =\ OperandResolver\.getSingleValue\(\\n\ \ \ \ \ \ \ \ \ \ arg0,\\n\ \ \ \ \ \ \ \ \ \ srcRowIndex,\\n\ \ \ \ \ \ \ \ \ \ srcColumnIndex\\n\ \ \ \ \ \ \ \ \);", type_label=expression_statement];
+41 [label="15_\ double\ result\ =\ OperandResolver\.coerceValueToDouble\(ve\);", type_label=expression_statement];
+50 [label="16_\ if\(Double\.isNaN\(result\)\ \|\|\ Double\.isInfinite\(result\)\)", type_label=if];
+64 [label="17_\ throw\ new\ EvaluationException\(ErrorEval\.NUM_ERROR\);", type_label=expression_statement];
+71 [label="19_\ if\(arg1\ instanceof\ RefListEval\)", type_label=if];
+77 [label="20_\ return\ eval\(result,\ \(\(RefListEval\)\ arg1\),\ true\);", type_label=return];
+87 [label="22_\ final\ AreaEval\ aeRange\ =\ convertRangeArg\(arg1\);", type_label=expression_statement];
+96 [label="23_\ return\ eval\(result,\ aeRange,\ true\);", type_label=return];
+103 [label="24_\ catch\ \(EvaluationException\ e\)", type_label=catch];
+109 [label="25_\ return\ e\.getErrorEval\(\);", type_label=return];
+1 [label="1_\ start_node", type_label=start];
+10 -> 28  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label=first_next_line];
+28 -> 30  [color=red, controlflow_type=next, edge_type=CFG_edge, key=0, label=next];
+30 -> 41  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="next_line 1"];
+30 -> 103  [color=red, controlflow_type=catch_exception, edge_type=CFG_edge, key=0, label=catch_exception];
+41 -> 50  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="next_line 1"];
+41 -> 103  [color=red, controlflow_type=catch_exception, edge_type=CFG_edge, key=0, label=catch_exception];
+50 -> 103  [color=red, controlflow_type=catch_exception, edge_type=CFG_edge, key=0, label=catch_exception];
+50 -> 64  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label=pos_next];
+50 -> 71  [color=red, controlflow_type="next_line 6", edge_type=CFG_edge, key=0, label="next_line 6"];
+64 -> 103  [color=red, controlflow_type=catch_exception, edge_type=CFG_edge, key=0, label=catch_exception];
+71 -> 103  [color=red, controlflow_type=catch_exception, edge_type=CFG_edge, key=0, label=catch_exception];
+71 -> 77  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label=pos_next];
+71 -> 87  [color=red, controlflow_type="next_line 6", edge_type=CFG_edge, key=0, label="next_line 6"];
+77 -> 103  [color=red, controlflow_type=catch_exception, edge_type=CFG_edge, key=0, label=catch_exception];
+87 -> 96  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="next_line 1"];
+87 -> 103  [color=red, controlflow_type=catch_exception, edge_type=CFG_edge, key=0, label=catch_exception];
+96 -> 103  [color=red, controlflow_type=catch_exception, edge_type=CFG_edge, key=0, label=catch_exception];
+103 -> 109  [color=red, controlflow_type=next, edge_type=CFG_edge, key=0, label=next];
+1 -> 10  [color=red, controlflow_type=next, edge_type=CFG_edge, key=0, label=next];
+}

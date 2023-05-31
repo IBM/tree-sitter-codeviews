@@ -1,0 +1,31 @@
+digraph  {
+6 [label="1_\ public\ class\ Test\ ", type_label=class_declaration];
+10 [label="2_\ \ @Override\\n\ \ \ \ \ \ public\ OCommandRequestAbstract\ onAsyncReplicationError\ \(final\ OAsyncReplicationError\ iCallback\)", type_label=method_declaration];
+22 [label="4_\ if\(iCallback\ !=\ null\)", type_label=if];
+28 [label="5_\ onAsyncReplicationError\ =\ new\ OAsyncReplicationError\(\)\ ;", type_label=expression_statement];
+35 [label="6_\ int\ retry\ =\ 0;", type_label=expression_statement];
+40 [label="8_\ \ @Override\\n\ \ \ \ \ \ \ \ \ \ \ \ public\ ACTION\ onAsyncReplicationError\ \(Throwable\ iException,\ final\ int\ iRetry\)", type_label=method_declaration];
+55 [label="10_\ switch\ \(iCallback\.onAsyncReplicationError\(iException,\ \+\+retry\)\)\ ", type_label=switch];
+65 [label="11_\ case\ RETRY:", type_label=case];
+68 [label="12_\ execute\(\);", type_label=expression_statement];
+72 [label="13_\ break;", type_label=expression_statement];
+73 [label="15_\ case\ IGNORE:", type_label=case];
+76 [label="19_\ return\ ACTION\.IGNORE;", type_label=return];
+80 [label="23_\ onAsyncReplicationError\ =\ null;", type_label=expression_statement];
+84 [label="24_\ return\ this;", type_label=return];
+1 [label="1_\ start_node", type_label=start];
+10 -> 22  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label=first_next_line];
+22 -> 28  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label=pos_next];
+22 -> 80  [color=red, controlflow_type=neg_next, edge_type=CFG_edge, key=0, label=neg_next];
+28 -> 84  [color=red, controlflow_type="next_line 2", edge_type=CFG_edge, key=0, label="next_line 2"];
+40 -> 55  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label=first_next_line];
+55 -> 65  [color=red, controlflow_type=switch_case, edge_type=CFG_edge, key=0, label=switch_case];
+55 -> 73  [color=red, controlflow_type=switch_case, edge_type=CFG_edge, key=0, label=switch_case];
+55 -> 76  [color=red, controlflow_type=switch_exit, edge_type=CFG_edge, key=0, label=switch_exit];
+65 -> 68  [color=red, controlflow_type=case_next, edge_type=CFG_edge, key=0, label=case_next];
+68 -> 72  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="next_line 1"];
+72 -> 76  [color=red, controlflow_type=jump_next, edge_type=CFG_edge, key=0, label=jump_next];
+73 -> 76  [color=red, controlflow_type=switch_out, edge_type=CFG_edge, key=0, label=switch_out];
+80 -> 84  [color=red, controlflow_type="next_line 4", edge_type=CFG_edge, key=0, label="next_line 4"];
+1 -> 10  [color=red, controlflow_type=next, edge_type=CFG_edge, key=0, label=next];
+}
