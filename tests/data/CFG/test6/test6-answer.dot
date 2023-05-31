@@ -182,7 +182,6 @@ digraph  {
 495 -> 505  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="next_line 1"];
 505 -> 515  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="next_line 1"];
 515 -> 527  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="next_line 1"];
-527 -> 533  [color=red, controlflow_type="next_line *", edge_type=CFG_edge, key=0, label="next_line *"];
 533 -> 541  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="next_line 1"];
 1 -> 10  [color=red, controlflow_type=next, edge_type=CFG_edge, key=0, label=next];
 }

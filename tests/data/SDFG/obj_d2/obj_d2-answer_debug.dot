@@ -15,15 +15,15 @@ digraph  {
 134 [label="14_\ int\ sum4\ =\ 2\ \+\ br\.attribute2\.subattribute1\ ;", type_label=local_declaration];
 1 [label="1_\ start_node", type_label=start];
 10 -> 23  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label="{,1,0|1}"];
-23 -> 40  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br,2,0|1|2},{,1,0|1}"];
-40 -> 49  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br,2,0|1|2},{,1,0|1},{a1,3,0|1|2}"];
-49 -> 56  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br.attribute1.subattribute1,4,0|1|2},{br,2,0|1|2},{,1,0|1},{a1,3,0|1|2}"];
-56 -> 63  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{a1,3,0|1|2},{,1,0|1},{br.attribute1,5,0|1|2},{br,2,0|1|2},{br.attribute1.subattribute1,4,0|1|2}"];
-63 -> 74  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{a1,3,0|1|2},{,1,0|1},{br.attribute1,5,0|1|2},{br,2,0|1|2},{a11,6,0|1|2},{br.attribute1.subattribute1,4,0|1|2}"];
-74 -> 79  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{a1,3,0|1|2},{,1,0|1},{br.attribute1,5,0|1|2},{br,2,0|1|2},{br.attribute2,7,0|1|2},{a11,6,0|1|2},{br.attribute1.subattribute1,4,0|1|2}"];
-79 -> 88  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{a1,3,0|1|2},{br,2,0|1|2},{br.attribute2,7,0|1|2},{a2,8,0|1|2},{,1,0|1},{br.attribute1.subattribute1,4,0|1|2},{a11,6,0|1|2},{br.attribute1,5,0|1|2}"];
-88 -> 99  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{a1,3,0|1|2},{br,2,0|1|2},{br.attribute2,7,0|1|2},{a21,9,0|1|2},{a2,8,0|1|2},{,1,0|1},{br.attribute1.subattribute1,4,0|1|2},{a11,6,0|1|2},{br.attribute1,5,0|1|2}"];
-99 -> 110  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{a1,3,0|1|2},{br,2,0|1|2},{br.attribute2,7,0|1|2},{a21,9,0|1|2},{a2,8,0|1|2},{,1,0|1},{sum,10,0|1|2},{br.attribute1.subattribute1,4,0|1|2},{a11,6,0|1|2},{br.attribute1,5,0|1|2}"];
-110 -> 121  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{a1,3,0|1|2},{sum2,11,0|1|2},{br,2,0|1|2},{br.attribute2,7,0|1|2},{a21,9,0|1|2},{a2,8,0|1|2},{,1,0|1},{sum,10,0|1|2},{br.attribute1.subattribute1,4,0|1|2},{a11,6,0|1|2},{br.attribute1,5,0|1|2}"];
-121 -> 134  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{a1,3,0|1|2},{sum2,11,0|1|2},{br,2,0|1|2},{br.attribute2,7,0|1|2},{a21,9,0|1|2},{a2,8,0|1|2},{,1,0|1},{sum,10,0|1|2},{br.attribute1.subattribute1,4,0|1|2},{a11,6,0|1|2},{br.attribute1,5,0|1|2},{sum3,12,0|1|2}"];
+23 -> 40  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{,1,0|1},{br,2,0|1|2}"];
+40 -> 49  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{,1,0|1},{br,2,0|1|2},{a1,3,0|1|2}"];
+49 -> 56  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{,1,0|1},{br,2,0|1|2},{a1,3,0|1|2},{br.attribute1.subattribute1,4,0|1|2}"];
+56 -> 63  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{,1,0|1},{br,2,0|1|2},{a1,3,0|1|2},{br.attribute1.subattribute1,4,0|1|2},{br.attribute1,5,0|1|2}"];
+63 -> 74  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{,1,0|1},{br,2,0|1|2},{a1,3,0|1|2},{a11,6,0|1|2},{br.attribute1.subattribute1,4,0|1|2},{br.attribute1,5,0|1|2}"];
+74 -> 79  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{,1,0|1},{br.attribute2,7,0|1|2},{br,2,0|1|2},{a1,3,0|1|2},{a11,6,0|1|2},{br.attribute1.subattribute1,4,0|1|2},{br.attribute1,5,0|1|2}"];
+79 -> 88  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br,2,0|1|2},{a11,6,0|1|2},{a1,3,0|1|2},{br.attribute1.subattribute1,4,0|1|2},{a2,8,0|1|2},{br.attribute2,7,0|1|2},{,1,0|1},{br.attribute1,5,0|1|2}"];
+88 -> 99  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{a21,9,0|1|2},{br,2,0|1|2},{a11,6,0|1|2},{a1,3,0|1|2},{br.attribute1.subattribute1,4,0|1|2},{a2,8,0|1|2},{br.attribute2,7,0|1|2},{,1,0|1},{br.attribute1,5,0|1|2}"];
+99 -> 110  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{a21,9,0|1|2},{br,2,0|1|2},{a11,6,0|1|2},{a1,3,0|1|2},{br.attribute1.subattribute1,4,0|1|2},{a2,8,0|1|2},{br.attribute2,7,0|1|2},{,1,0|1},{br.attribute1,5,0|1|2},{sum,10,0|1|2}"];
+110 -> 121  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{sum2,11,0|1|2},{a21,9,0|1|2},{br,2,0|1|2},{a11,6,0|1|2},{a1,3,0|1|2},{br.attribute1.subattribute1,4,0|1|2},{a2,8,0|1|2},{br.attribute2,7,0|1|2},{,1,0|1},{br.attribute1,5,0|1|2},{sum,10,0|1|2}"];
+121 -> 134  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{sum2,11,0|1|2},{a21,9,0|1|2},{br,2,0|1|2},{a11,6,0|1|2},{a1,3,0|1|2},{sum3,12,0|1|2},{br.attribute1.subattribute1,4,0|1|2},{a2,8,0|1|2},{br.attribute2,7,0|1|2},{,1,0|1},{br.attribute1,5,0|1|2},{sum,10,0|1|2}"];
 }

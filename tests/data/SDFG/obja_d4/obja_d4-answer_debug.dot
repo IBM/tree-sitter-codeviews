@@ -10,12 +10,12 @@ digraph  {
 84 [label="9_\ unused\ =\ unused\ /\ obj\.sum;", type_label=expression_statement];
 1 [label="1_\ start_node", type_label=start];
 10 -> 21  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label="{args,1,0|1}"];
-21 -> 35  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{args,1,0|1},{arr,2,0|1|2}"];
-35 -> 44  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{args,1,0|1},{obj,3,0|1|2},{arr,2,0|1|2}"];
-44 -> 53  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{obj.sum,4,0|1|2},{args,1,0|1},{obj,3,0|1|2},{arr,2,0|1|2}"];
-53 -> 66  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{obj.sum,6,0|1|2|3|4},{obj.sum,4,0|1|2},{unused,8,0|1|2|3|4},{args,1,0|1},{obj,3,0|1|2},{i,5,0|1|2|3},{arr,2,0|1|2}"];
-53 -> 53  [color=red, controlflow_type=loop_update, edge_type=CFG_edge, key=0, label="{obj.sum,6,0|1|2|3|4},{obj.sum,4,0|1|2},{unused,8,0|1|2|3|4},{args,1,0|1},{obj,3,0|1|2},{i,5,0|1|2|3},{arr,2,0|1|2}"];
-66 -> 77  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{obj.sum,6,0|1|2|3|4},{i,5,0|1|2|3},{unused,8,0|1|2|3|4},{args,1,0|1},{obj,3,0|1|2},{arr,2,0|1|2}"];
-77 -> 84  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{obj.sum,6,0|1|2|3|4},{i,5,0|1|2|3},{args,1,0|1},{obj,3,0|1|2},{unused,7,0|1|2|3|4},{arr,2,0|1|2}"];
-84 -> 53  [color=red, controlflow_type=loop_control, edge_type=CFG_edge, key=0, label="{obj.sum,6,0|1|2|3|4},{i,5,0|1|2|3},{args,1,0|1},{obj,3,0|1|2},{unused,8,0|1|2|3|4},{arr,2,0|1|2}"];
+21 -> 35  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{arr,2,0|1|2},{args,1,0|1}"];
+35 -> 44  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{arr,2,0|1|2},{args,1,0|1},{obj,3,0|1|2}"];
+44 -> 53  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{obj.sum,4,0|1|2},{arr,2,0|1|2},{args,1,0|1},{obj,3,0|1|2}"];
+53 -> 66  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{obj.sum,4,0|1|2},{unused,8,0|1|2|3|4},{arr,2,0|1|2},{obj,3,0|1|2},{obj.sum,6,0|1|2|3|4},{args,1,0|1},{i,5,0|1|2|3}"];
+53 -> 53  [color=red, controlflow_type=loop_update, edge_type=CFG_edge, key=0, label="{obj.sum,4,0|1|2},{unused,8,0|1|2|3|4},{arr,2,0|1|2},{obj,3,0|1|2},{obj.sum,6,0|1|2|3|4},{args,1,0|1},{i,5,0|1|2|3}"];
+66 -> 77  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{unused,8,0|1|2|3|4},{arr,2,0|1|2},{obj,3,0|1|2},{obj.sum,6,0|1|2|3|4},{args,1,0|1},{i,5,0|1|2|3}"];
+77 -> 84  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{arr,2,0|1|2},{obj,3,0|1|2},{obj.sum,6,0|1|2|3|4},{unused,7,0|1|2|3|4},{args,1,0|1},{i,5,0|1|2|3}"];
+84 -> 53  [color=red, controlflow_type=loop_control, edge_type=CFG_edge, key=0, label="{unused,8,0|1|2|3|4},{arr,2,0|1|2},{obj,3,0|1|2},{obj.sum,6,0|1|2|3|4},{args,1,0|1},{i,5,0|1|2|3}"];
 }
