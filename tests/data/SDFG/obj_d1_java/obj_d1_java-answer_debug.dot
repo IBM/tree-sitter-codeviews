@@ -9,9 +9,9 @@ digraph  {
 65 [label="8_\ BufferedReader\ br2\ =\ br;", type_label=expression_statement];
 1 [label="1_\ start_node", type_label=start];
 10 -> 21  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label="{args,1,0}"];
-21 -> 34  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{args,1,0},{br,2,0}"];
-34 -> 41  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{args,1,0},{br,2,0},{str,3,0}"];
-41 -> 47  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{args,1,0},{br,2,0},{str,4,0|1|2}"];
-47 -> 55  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{args,1,0},{br,2,0},{str,4,0|1|2},{br.attribute1,5,0}"];
-55 -> 65  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{args,1,0},{br,2,0},{str,4,0|1|2},{br.attribute1,5,0}"];
+21 -> 34  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br,2,0},{args,1,0}"];
+34 -> 41  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{str,3,0},{br,2,0},{args,1,0}"];
+41 -> 47  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{str,4,0|1|2},{br,2,0},{args,1,0}"];
+47 -> 55  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{str,4,0|1|2},{br.attribute1,5,0},{br,2,0},{args,1,0}"];
+55 -> 65  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{str,4,0|1|2},{br.attribute1,5,0},{br,2,0},{args,1,0}"];
 }
