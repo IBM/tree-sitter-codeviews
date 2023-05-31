@@ -1,0 +1,27 @@
+digraph  {
+6 [label="1_\ class\ A\ ", type_label=class_declaration];
+9 [label="2_\ boolean\ isOn;", type_label=expression_statement];
+13 [label="3_\ static\ int\ j;", type_label=expression_statement];
+18 [label="4_\ \ A\ \(\)", type_label=constructor_declaration];
+22 [label="5_\ isOn\ =\ false;", type_label=expression_statement];
+26 [label="7_\ \ static\ String\ z\ \(\)", type_label=method_declaration];
+32 [label="8_\ System\.out\.println\(j\);", type_label=expression_statement];
+40 [label="9_\ return\ \"z\";", type_label=return];
+42 [label="13_\ class\ Main\ ", type_label=class_declaration];
+45 [label="14_\ \ public\ static\ void\ main\ \(String\[\]\ args\)", type_label=method_declaration];
+56 [label="15_\ A\.z\(\);", type_label=expression_statement];
+1 [label="1_\ start_node", type_label=start];
+6 -> 9  [color=red, controlflow_type=class_next, edge_type=CFG_edge, key=0, label=class_next];
+9 -> 13  [color=red, controlflow_type=class_next, edge_type=CFG_edge, key=0, label=class_next];
+13 -> 18  [color=red, controlflow_type=constructor_next, edge_type=CFG_edge, key=0, label=constructor_next];
+13 -> 32  [key=0, used_def=j];
+18 -> 22  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label=first_next_line];
+26 -> 32  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label=first_next_line];
+32 -> 40  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="next_line 1"];
+40 -> 56  [color=red, controlflow_type=method_return, edge_type=CFG_edge, key=0, label=method_return];
+40 -> 56  [key=1];
+42 -> 45  [color=red, controlflow_type=main_method_next, edge_type=CFG_edge, key=0, label=main_method_next];
+45 -> 56  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label=first_next_line];
+56 -> 26  [color=red, controlflow_type="method_call|57", edge_type=CFG_edge, key=0, label=method_call];
+1 -> 42  [color=red, controlflow_type=next, edge_type=CFG_edge, key=0, label=next];
+}
