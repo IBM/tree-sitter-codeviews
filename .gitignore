@@ -7,4 +7,3 @@ src/comex.egg-info/
 dist/
 ./*.png
 ./*.dot
-./*.json
