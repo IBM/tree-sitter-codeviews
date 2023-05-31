@@ -17,11 +17,11 @@ pp = pprint.PrettyPrinter(indent=4)
 system_type = ("Console", "System", "String")
 debug = False
 
-if any(
-        # GITHUB_ACTIONS
-        x in os.environ for x in ("PYCHARM_HOSTED",)
-):
-    debug = True
+# if any(
+#         # GITHUB_ACTIONS
+#         x in os.environ for x in ("PYCHARM_HOSTED",)
+# ):
+#     debug = True
 
 
 def scope_check(parent_scope, child_scope):
@@ -126,7 +126,7 @@ def parent_remapping_callback(node):
     if node is None:
         return None
     elif node.type == "do_statement":
-        return None
+        return node.named_children[-1]
     elif node.type == "try_statement":
         return None
         # while_node = None
@@ -639,7 +639,6 @@ def dfg_csharp(properties, CFG_results):
 
     switch_type = ['switch_expression', 'switch_statement']
     # switch_cases = ['switch_expression_arm', 'switch_section']
-    handled_cases = ["switch_section", "local_declaration_statement"]
 
     method_declaration = ['method_declaration']
     handled_types = assignment + def_statement + increment_statement + method_calls + method_declaration + switch_type
@@ -647,7 +646,7 @@ def dfg_csharp(properties, CFG_results):
     method_invocation = method_calls + ["object_creation_expression", "explicit_constructor_invocation"]
 
     call_variable_map = {}
-    handled_cases = []
+    handled_cases = ["switch_section", "local_declaration_statement"]
 
     # if_statement = ["if_statement", "else"]
     # for_statement = ["for_statement"]
@@ -674,6 +673,8 @@ def dfg_csharp(properties, CFG_results):
         if edge_data["label"] == "class_return":
             # call_statement = node_list[read_index(index, edge[1])]
             # call_node = recursively_get_children_of_types(call_statement, method_invocation)[0]
+            if read_index(index, edge[0]) not in node_list:
+                continue
             last_statement = node_list[read_index(index, edge[0])]
             class_node = return_first_parent_of_types(last_statement, "class_declaration")
             class_name = st(class_node.child_by_field_name("name"))
