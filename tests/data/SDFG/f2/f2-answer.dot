@@ -172,8 +172,6 @@ digraph  {
 324 -> 331  [key=0, used_def=number];
 331 -> 331  [key=0, used_def=i];
 331 -> 343  [key=0, used_def=i];
-331 -> 425  [color=green, key=0];
-343 -> 425  [color=green, key=0];
 351 -> 351  [key=0, used_def=outer];
 351 -> 364  [key=0, used_def=outer];
 351 -> 377  [key=0, used_def=outer];
@@ -182,8 +180,6 @@ digraph  {
 364 -> 377  [key=0, used_def=inner];
 364 -> 383  [key=0, used_def=inner];
 400 -> 409  [key=0, used_def=i];
-400 -> 425  [color=green, key=0];
-409 -> 425  [color=green, key=0];
 425 -> 436  [color=green, key=0];
 436 -> 436  [key=0, used_def=i];
 436 -> 451  [key=0, used_def=i];
