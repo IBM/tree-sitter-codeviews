@@ -283,6 +283,8 @@ class CFGGraph_csharp(CFGGraph):
             ]
             if body_nodes:
                 body_node = body_nodes[0]
+            elif current_node_value.type == "while_statement":
+                body_node = current_node_value.named_children[-1]
             else:
                 try:
                     body_node = current_node_value.named_children[0]
