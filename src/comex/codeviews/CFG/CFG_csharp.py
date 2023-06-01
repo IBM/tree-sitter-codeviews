@@ -284,7 +284,10 @@ class CFGGraph_csharp(CFGGraph):
             if body_nodes:
                 body_node = body_nodes[0]
             else:
-                body_node = current_node_value.named_children[-1]
+                try:
+                    body_node = current_node_value.named_children[0]
+                except:
+                    body_node = current_node_value.named_children[-1]
         flag = False
         while body_node.type == "block":
             for child in body_node.children:
@@ -372,7 +375,6 @@ class CFGGraph_csharp(CFGGraph):
     def get_class_name(self, node):
         reference_node = node.child_by_field_name("object")
         types = ["scoped_type_identifier", "type_identifier", "generic_type"]
-
         if reference_node is None or reference_node.type == "this":
             while node is not None:
                 if node.type == "class_declaration":
@@ -380,10 +382,17 @@ class CFGGraph_csharp(CFGGraph):
                     class_name = list(filter(lambda child: child.type == "identifier", node.children))[0]
                     class_name = [class_name.text.decode("UTF-8")]
                     break
+                if node.type == "struct_declaration":
+                    class_name = list(filter(lambda child: child.type == "identifier", node.children))[0]
+                    class_name = [class_name.text.decode("UTF-8")]
+                if node.type == "local_function_statement":
+                    class_name = list(filter(lambda child: child.type == "identifier", node.children))[0]
+                    class_name = [class_name.text.decode("UTF-8")]
                 node = node.parent
             try:
                 class_name += self.records['extends'][class_name[0]]
             except:
+                class_name = "Unknown"
                 pass
             return class_name
         try:
@@ -443,6 +452,7 @@ class CFGGraph_csharp(CFGGraph):
         }
         signature = []
         for argument in argument_list:
+            argument = argument.named_children[-1]
             if argument.type == "identifier":
                 identifier_index = self.get_index(argument)
                 try:
@@ -540,7 +550,7 @@ class CFGGraph_csharp(CFGGraph):
     # TODO: Check correctness nd function calls to this
     def function_list(self, current_node, node_list):
         current_index = self.get_index(current_node)
-        if current_node.type == "method_invocation":
+        if current_node.type == "method_invocation" or current_node.type == "invocation_expression" :
             parent_node = None
             pointer_node = current_node
             while pointer_node is not None:
@@ -556,10 +566,13 @@ class CFGGraph_csharp(CFGGraph):
             parent_index = self.get_index(parent_node)
             # maintain a list of all method invocations
             # IDENTIFY THE CLASS THAT THE ALIAS BELONGS TO AND USE THAT IN THE MAP MAYBE? 
-            base_method_name = current_node.child_by_field_name("name").text.decode("UTF-8")
+            base_method_name = current_node.child_by_field_name("function").text.decode("UTF-8")
+            base_method_name = base_method_name.split(".")[-1]
+            # print(base_method_name)
             signature = ()
             argument_list = current_node.child_by_field_name("arguments")
             argument_list = list(filter(lambda child: child.is_named, argument_list.children))
+            # print(argument_list)
             signature = self.get_signature(argument_list)
 
             class_name_list = self.get_class_name(current_node)
