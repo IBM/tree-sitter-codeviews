@@ -1,13 +1,13 @@
 # Tree Sitter Multi Codeview Generator
 
-Tree Sitter Multi Codeview Generator aims to generate combined multi-code view graphs that can be used with various types of machine learning models (sequence model neural networks, graph neural networks, etc). It is also designed to be easily extended to various source code languages. [tree-sitter](https://tree-sitter.github.io/tree-sitter/) is used for parsing which is highly efficient and has support for over 40+ languages. Currently, this repository supports codeviews for Java in over 40 possible combinations of codeviews. It has been structured such that support for other languages can be easily added. If you wish to add support for more languages, please refer to the [contributing](https://github.com/IBM/tree-sitter-codeviews/blob/main/CONTRIBUTING.md) guide.
+Tree Sitter Multi Codeview Generator aims to generate combined multi-code view graphs that can be used with various types of machine learning models (sequence models, graph neural networks, etc). 
 
-## Comex
-`comex` is a rebuild of Tree Sitter Multi Codeview Generator for easier invocation as a Python package. 
-This rebuild also includes a cli interface for easier usage.
-It isolates the logic pertaining to the generation and combination of codeviews to better differentiate tasks involved in the `IBM OSCP Project`.
+# Comex
+`comex` is a rebuild of Tree Sitter Multi Codeview Generator for easier invocation as a Python package. This rebuild also includes a cli interface. Currently, ```comex``` generates codeviews for Java and C#, for both method-level and file-level code snippets.  ```comex``` can be used to generate over $15$ possible combinations of codeviews for both languages (complete list [here](https://github.com/IBM/tree-sitter-codeviews/blob/main/List_Of_Views.pdf)). ```comex``` is designed to be easily extendable to various programming languages. This is primarliy because we use [tree-sitter](https://tree-sitter.github.io/tree-sitter/) for parsing, a highly efficient incremental parser that supports over $40$ languages. If you wish to add support for more languages, please refer to the [contributing](https://github.com/IBM/tree-sitter-codeviews/blob/main/CONTRIBUTING.md) guide.
 
-### Installation
+**Note**: While C# _method-level_ support is available on the ```main``` branch, _file-level_ support is available on the ```dev``` branch but is currently under active development and testing.
+
+## Installation from PyPi
 
 `comex` is published on the Python Registry and can be easily installed via pip:
 
@@ -17,15 +17,12 @@ pip install comex
 
 **Note**: You would need to install GraphViz([dot](https://graphviz.org/download/)) so that the graph visualizations are generated
 
----
+## Installation from source
+
 To setup `comex` for development using the source code in your python environment:
 
 ```console
 pip install -r requirements-dev.txt
-```
-**Note**: Please clone recursively so sub-modules are setup correctly
-```console
-git clone --recursive {...}
 ```
 
 This performs an editable install, meaning that comex would be available throughout your environment (particularly relevant if you use conda or something of the sort). This means now you can interact and import from `comex` just like any other package while remaining standalone but also reflecting any code side updates without any other manual steps
