@@ -11,6 +11,7 @@ class_declaration_statements = [
     "property_declaration",
     "class_declaration",
     "field_declaration",
+    "struct_declaration",
     
 ]
 
@@ -116,7 +117,7 @@ def return_index_of_first_parent_of_type(node, parent_type):
 def get_signature(node):
     signature = []
     formal_parameters = node.child_by_field_name('parameters')
-    formal_parameters = list(filter(lambda x: x.type == 'formal_parameter', formal_parameters.children))
+    formal_parameters = list(filter(lambda x: x.type == 'parameter', formal_parameters.named_children))
     for formal_parameter in formal_parameters:
         for child in formal_parameter.children:
             if child.type != "identifier":
