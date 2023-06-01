@@ -1,0 +1,21 @@
+digraph  {
+6 [label="1_\ public\ class\ DFG_A2\ ", type_label=class_declaration];
+10 [label="2_\ \ public\ void\ main\ \(string\[\]\ args\)", type_label=method_declaration];
+21 [label="3_\ BufferedReader\ br\ =\ new\ BufferedReader\(new\ InputStreamReader\(System\.in\)\);", type_label=expression_statement];
+34 [label="4_\ String\ str\ =\ br\.attribute1;", type_label=expression_statement];
+41 [label="5_\ str\ =\ br\.attribute2\.method1\(\);", type_label=expression_statement];
+50 [label="6_\ br\.attribute1\ =\ br\.attribute2;", type_label=expression_statement];
+58 [label="7_\ br\.method2\(br\.attribute1,\ br\.attribute2\);", type_label=expression_statement];
+69 [label="8_\ BufferedReader\ br2\ =\ br;", type_label=expression_statement];
+74 [label="9_\ br\.method3\(\);", type_label=expression_statement];
+79 [label="10_\ int\ j\ =\ br2\.attribute1\.method2\(3,4\);", type_label=expression_statement];
+1 [label="1_\ start_node", type_label=start];
+10 -> 21  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label="{args,1,0}"];
+21 -> 34  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br,2,0},{args,1,0}"];
+34 -> 41  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{br,2,0},{args,1,0},{str,3,0}"];
+41 -> 50  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{str,4,0|1|2},{br,2,0},{args,1,0},{br.attribute2.method1(),4,0,()}"];
+50 -> 58  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{str,4,0|1|2},{args,1,0},{br.attribute1,5,0},{br,2,0},{br.attribute2.method1(),4,0,()}"];
+58 -> 69  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{str,4,0|1|2},{br,6,0|1|2,()},{args,1,0},{br.attribute1,5,0},{br.attribute2.method1(),4,0,()}"];
+69 -> 74  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{str,4,0|1|2},{br,6,0|1|2,()},{args,1,0},{br2,7,0},{br.attribute1,5,0},{br.attribute2.method1(),4,0,()}"];
+74 -> 79  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{str,4,0|1|2},{br,8,0|1|2,()},{args,1,0},{br2,7,0},{br.attribute1,5,0},{br.attribute2.method1(),4,0,()}"];
+}

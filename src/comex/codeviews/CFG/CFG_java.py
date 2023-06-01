@@ -120,7 +120,7 @@ class CFGGraph_java(CFGGraph):
                 dest_node,
             )
             logger.warning(traceback.format_stack()[-2])
-            print(src_node, dest_node, edge_type)
+            # print(src_node, dest_node, edge_type)
             raise NotImplementedError
         else:
             for src, dest, ty, *_ in self.CFG_edge_list:
@@ -193,7 +193,7 @@ class CFGGraph_java(CFGGraph):
         
         except Exception as e:
             # return 2, None
-            print("DO NOT IGNORE", e)
+            # print("DO NOT IGNORE", e)
             logger.warning(traceback.format_stack()[-2])
             raise NotImplementedError
             return next_node_index, next_node
