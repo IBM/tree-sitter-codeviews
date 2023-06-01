@@ -36,22 +36,24 @@ class CustomParser:
         ]
         vendor_languages = []
 
-        if not os.path.isfile(shared_languages):
-            print("First time running COMEX: Setting up tree-sitter grammars")
-            for url, commit in grammar_repos:
-                vendor_language = os.path.join(clone_directory, url.rstrip("/").split("/")[-1])
-                vendor_languages.append(vendor_language)
-                if os.path.exists(vendor_language):
-                    shutil.rmtree(vendor_language)
-                os.makedirs(vendor_language, exist_ok=True)
-                subprocess.check_call(["git", "init"], cwd=vendor_language, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-                subprocess.check_call(["git", "remote", "add", "origin", url], cwd=vendor_language, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-                subprocess.check_call(["git", "fetch", "--depth=1", "origin", commit], cwd=vendor_language, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-                subprocess.check_call(["git", "checkout", commit], cwd=vendor_language, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        else:
-            for url, commit in grammar_repos:
-                vendor_language = os.path.join(clone_directory, url.rstrip("/").split("/")[-1])
-                vendor_languages.append(vendor_language)
+        for url, commit in grammar_repos:
+            grammar = url.rstrip("/").split("/")[-1]
+            vendor_language = os.path.join(clone_directory, grammar)
+            vendor_languages.append(vendor_language)
+            if os.path.isfile(shared_languages) and not os.path.exists(vendor_language):
+                os.remove(shared_languages)
+            elif not os.path.isfile(shared_languages) and os.path.exists(vendor_language):
+                shutil.rmtree(vendor_language)
+            elif not os.path.isfile(shared_languages) and not os.path.exists(vendor_language):
+                pass
+            else:
+                continue
+            print(f"Intial Setup: First time running COMEX on {grammar}")
+            os.makedirs(vendor_language, exist_ok=True)
+            subprocess.check_call(["git", "init"], cwd=vendor_language, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            subprocess.check_call(["git", "remote", "add", "origin", url], cwd=vendor_language, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            subprocess.check_call(["git", "fetch", "--depth=1", "origin", commit], cwd=vendor_language, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            subprocess.check_call(["git", "checkout", commit], cwd=vendor_language, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
         # build_id = ""
         # for vendor_language in vendor_languages:

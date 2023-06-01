@@ -1,0 +1,30 @@
+digraph  {
+6 [label="1_\ class\ GFG\ ", type_label=class_declaration];
+9 [label="4_\ \ public\ static\ void\ Main\ \(String\[\]\ args\)", type_label=method_declaration];
+21 [label="7_\ string\ topic\ ;", type_label=local_declaration];
+26 [label="8_\ string\ category\ ;", type_label=local_declaration];
+31 [label="11_\ topic\ =\ \"Inheritance\";", type_label=expression_statement];
+36 [label="14_\ if\ \(\ \(String\.Compare\(topic,\ \"Introduction\ to\ C\#\"\)\ ==\ 0\)\ \|\|\\n\ \ \ \ \ \ \ \ \ \ \ \ \(String\.Compare\(topic,\ \"Variables\"\)\ ==\ 0\)\ \|\|\\n\ \ \ \ \ \ \ \ \ \ \ \ \(String\.Compare\(topic,\ \"Data\ Types\"\)\ ==\ 0\)\ \)", type_label=if];
+76 [label="18_\ category\ =\ \"Basic\";", type_label=expression_statement];
+81 [label="22_\ if\ \(\ \(String\.Compare\(topic,\ \"Loops\"\)\ ==\ 0\)\ \|\|\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(String\.Compare\(topic,\ \"If\ Statements\"\)\ ==\ 0\)\ \|\|\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(String\.Compare\(topic,\ \"Jump\ Statements\"\)\ ==\ 0\)\ \)", type_label=if];
+121 [label="26_\ category\ =\ \"Control\ Flow\";", type_label=expression_statement];
+126 [label="30_\ if\ \(\ \(String\.Compare\(topic,\ \"Class\ \&\ Object\"\)\ ==\ 0\)\ \|\|\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(String\.Compare\(topic,\ \"Inheritance\"\)\ ==\ 0\)\ \|\|\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(String\.Compare\(topic,\ \"Constructors\"\)\ ==\ 0\)\ \)", type_label=if];
+166 [label="34_\ category\ =\ \"OOPS\ Concept\";", type_label=expression_statement];
+172 [label="39_\ category\ =\ \"Not\ Mentioned\";", type_label=expression_statement];
+177 [label="42_\ System\.Console\.Write\(\"Category\ is\ \"\ \+\ category\);", type_label=expression_statement];
+1 [label="1_\ start_node", type_label=start];
+9 -> 21  [color=red, controlflow_type=first_next_line, edge_type=CFG_edge, key=0, label="{args,3,0|1}"];
+21 -> 26  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{topic,6,0|1|2},{args,3,0|1}"];
+26 -> 31  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{topic,6,0|1|2},{category,7,0|1|2},{args,3,0|1}"];
+31 -> 36  [color=red, controlflow_type="next_line 1", edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,7,0|1|2},{args,3,0|1}"];
+36 -> 76  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,7,0|1|2},{args,3,0|1}"];
+36 -> 81  [color=red, controlflow_type=neg_next, edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,7,0|1|2},{args,3,0|1}"];
+76 -> 177  [color=red, controlflow_type=next_line, edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,17,0|1|2|3|4},{args,3,0|1}"];
+81 -> 121  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,7,0|1|2},{args,3,0|1}"];
+81 -> 126  [color=red, controlflow_type=neg_next, edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,7,0|1|2},{args,3,0|1}"];
+121 -> 177  [color=red, controlflow_type=next_line, edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,25,0|1|2|3|5|6},{args,3,0|1}"];
+126 -> 166  [color=red, controlflow_type=pos_next, edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,7,0|1|2},{args,3,0|1}"];
+126 -> 172  [color=red, controlflow_type=neg_next, edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,7,0|1|2},{args,3,0|1}"];
+166 -> 177  [color=red, controlflow_type=next_line, edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,33,0|1|2|3|5|7|8},{args,3,0|1}"];
+172 -> 177  [color=red, controlflow_type=next_line, edge_type=CFG_edge, key=0, label="{topic,10,0|1|2},{category,38,0|1|2|3|5|7|9},{args,3,0|1}"];
+}

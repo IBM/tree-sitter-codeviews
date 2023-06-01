@@ -1,0 +1,20 @@
+digraph  {
+6 [label="1_\ public\ class\ Function\ ", type_label=class_declaration];
+10 [label="2_\ \ public\ boolean\ isInNet\ \(String\ host,\ String\ pattern,\ String\ mask\)", type_label=method_declaration];
+25 [label="3_\ host\ =\ dnsResolve\(host\);", type_label=expression_statement];
+32 [label="4_\ if\(host\ ==\ null\ \|\|\ host\.length\(\)\ ==\ 0\)", type_label=if];
+45 [label="5_\ return\ false;", type_label=return];
+47 [label="7_\ long\ lhost\ =\ parseIpAddressToLong\(host\);", type_label=expression_statement];
+55 [label="8_\ long\ lpattern\ =\ parseIpAddressToLong\(pattern\);", type_label=expression_statement];
+63 [label="9_\ long\ lmask\ =\ parseIpAddressToLong\(mask\);", type_label=expression_statement];
+71 [label="10_\ return\ \(lhost\ \&\ lmask\)\ ==\ lpattern;", type_label=return];
+1 [label="1_\ start_node", type_label=start];
+10 -> 25  [key=0, used_def=host];
+10 -> 55  [key=0, used_def=pattern];
+10 -> 63  [key=0, used_def=mask];
+25 -> 32  [key=0, used_def=host];
+32 -> 47  [key=0, used_def=host];
+47 -> 71  [key=0, used_def=lhost];
+55 -> 71  [key=0, used_def=lpattern];
+63 -> 71  [key=0, used_def=lmask];
+}

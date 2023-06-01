@@ -1,0 +1,14 @@
+networkx==2.6.3
+tree-sitter==0.20.1
+deepdiff==5.8.1
+pydot==1.4.1
+typer==0.4.1
+
+[dev]
+pytest
+pytest-cov
+tqdm
+pqdm
+loguru
+GitPython
+pandas
