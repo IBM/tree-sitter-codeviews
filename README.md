@@ -81,14 +81,16 @@ Below we present more examples of input code snippets and generated codeviews fo
 
 <table>
 <tr>
-<td> CLI Command + Code </td> <td> Codeview Generated </td>
-</tr>
-<tr>
 <td>
+
+**CLI Command**:
 
 ```bash
 comex --lang "java" --code-file sample/example.java --graphs "cfg,dfg"
 ```
+---
+
+**Java Code Snippet**:
 
 ```Java
 import java.io.ByteArrayInputStream;
@@ -161,9 +163,9 @@ public class Main {
 }
 
 ```
+---
 
-</td>
-<td>
+**Generated Codeview**:
 
 ![Java File-level](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/java.png)
 </td>
@@ -171,9 +173,14 @@ public class Main {
 <tr>
 <td>
 
+**CLI Command**:
+
 ```bash
 comex --lang "cs" --code-file sample/example.cs --graphs "cfg,dfg"
 ```
+---
+
+**C# Code Snippet**:
 
 ```C#
 public class DFG_A2 {
@@ -189,9 +196,9 @@ public class DFG_A2 {
     }
 }
 ```
+---
 
-</td>
-<td>
+**Generated Codeview**:
 
 ![C# Method-level](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/cs.png)
 </td>
