@@ -71,12 +71,82 @@ graph_format: denotes the format of the output graph. Currently supported format
 codeviews: refers to the configuration passed for each codeview
 ````
 
-### Output Example:
+### Output Examples:
 
 Combined simple AST+CFG+DFG for a simple Java program that finds the maximum among 2 numbers:
 
-<img src="https://github.com/IBM/tree-sitter-codeviews/raw/main/sample.png" >
+![Sample AST+CFG+DFG](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample.png)
 
+Below we present more examples of input code snippets and generated codeviews for both Java and C#.
+
+<table>
+<tr>
+<td> CLI Command + Code </td> <td> Codeview Generated </td>
+</tr>
+<tr>
+<td>
+
+```bash
+comex --lang "java" --code-file tests/data/COMBINED/alex1.java --graphs "cfg,dfg"
+```
+
+```Java
+public class Alias {
+    static int static_variable = 4;
+    public static void main (String[] args) {
+        RandomClass temp = new RandomClass();
+        Dog jude = new Dog();
+        temp.method1();
+        if (static_variable == 4) {
+            temp.method2();
+            return;
+        }
+        else {
+        Dog joe = jude;
+        joe.a = 1;
+        }
+        jude.a.z = 4;
+        jude.a.z += 1;
+    }
+}
+
+```
+
+</td>
+<td>
+
+![Java File-level](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/alex1.png)
+</td>
+</tr>
+<tr>
+<td>
+
+```bash
+comex --lang "cs" --code-file tests/data/SDFG/obj_d2.cs --graphs "cfg,dfg"
+```
+
+```C#
+public class DFG_A2 {
+    public void main(string[] args) {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); // {}
+        String str = br.attribute1; // {3}
+        str = br.attribute2.method1(); // {3}
+        br.attribute1 = br.attribute2; // {3,5}
+        br.method2(br.attribute1, br.attribute2); // {3,5,6}
+        BufferedReader br2 = br; // {5,6,7}
+        br.method3(); // {5,6,7}
+        int j = br2.attribute1.method2(3,4); // {8}
+    }
+}
+```
+
+</td>
+<td>
+
+![C# Method-level](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/obj_d2.png)
+</td>
+</tr>
+</table>
 
 ### Code Organization
 The code is structured in the following way:
