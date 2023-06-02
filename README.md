@@ -75,7 +75,7 @@ codeviews: refers to the configuration passed for each codeview
 
 Combined simple AST+CFG+DFG for a simple Java program that finds the maximum among 2 numbers:
 
-![Sample AST CFG DFG](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample.png)
+![Sample AST CFG DFG](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/sample.png)
 
 Below we present more examples of input code snippets and generated codeviews for both Java and C#.
 
