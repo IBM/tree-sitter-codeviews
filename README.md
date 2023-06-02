@@ -79,9 +79,7 @@ Combined simple AST+CFG+DFG for a simple Java program that finds the maximum amo
 
 Below we present more examples of input code snippets and generated codeviews for both Java and C#.
 
-<table>
-<tr>
-<td>
+---
 
 **CLI Command**:
 
@@ -168,10 +166,8 @@ public class Main {
 **Generated Codeview**:
 
 ![Java File-level](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/java.png)
-</td>
-</tr>
-<tr>
-<td>
+
+---
 
 **CLI Command**:
 
@@ -201,9 +197,8 @@ public class DFG_A2 {
 **Generated Codeview**:
 
 ![C# Method-level](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/cs.png)
-</td>
-</tr>
-</table>
+
+---
 
 More examples and results can be found in the [tests/data](https://github.com/IBM/tree-sitter-codeviews/tree/main/tests/data) directory
 
