@@ -71,12 +71,134 @@ graph_format: denotes the format of the output graph. Currently supported format
 codeviews: refers to the configuration passed for each codeview
 ````
 
-### Output Example:
+### Output Examples:
 
 Combined simple AST+CFG+DFG for a simple Java program that finds the maximum among 2 numbers:
 
-<img src="https://github.com/IBM/tree-sitter-codeviews/raw/main/sample.png" >
+![Sample AST CFG DFG](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/sample.png)
 
+Below we present more examples of input code snippets and generated codeviews for both Java and C#.
+
+<table>
+<tr>
+<td> CLI Command + Code </td> <td> Codeview Generated </td>
+</tr>
+<tr>
+<td>
+
+```bash
+comex --lang "java" --code-file sample/example.java --graphs "cfg,dfg"
+```
+
+```Java
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+    //    static String INPUT = "5\n3 2 2 4 1\n1 2 2 2 1";
+    static String INPUT = "";
+
+    public static void main(String[] args) {
+        InputStream is = INPUT.isEmpty() ? System.in : new ByteArrayInputStream(INPUT.getBytes());
+
+        Scanner scanner = new Scanner(is);
+
+        final int n = scanner.nextInt();
+        List<Position> positionList = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            positionList.add(
+                    new Position(
+                            scanner.nextInt(),
+                            scanner.nextInt(),
+                            scanner.nextInt()
+                    )
+            );
+        }
+
+        System.out.println(solve(positionList) ? "Yes" : "No");
+    }
+
+    static class Position {
+        int t;
+        int x;
+        int y;
+
+        public Position(int t, int x, int y) {
+            this.t = t;
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    static boolean solve(List<Position> positionList) {
+        Position currentPosition = new Position(0, 0, 0);
+        for (int i = 0; i < positionList.size(); i++) {
+            Position nextPosition = positionList.get(i);
+            if (!possibleMove(currentPosition.t, nextPosition.t, currentPosition.x, nextPosition.x, currentPosition.y, nextPosition.y)) {
+                return false;
+            }
+            currentPosition = nextPosition;
+        }
+        return true;
+    }
+
+    static boolean possibleMove(int t1, int t2, int x1, int x2, int y1, int y2) {
+        int tDiff = t2 - t1;
+        int absX = Math.abs(x1 - x2);
+        int absY = Math.abs(y1 - y2);
+
+        if (absX + absY <= tDiff) {
+            if (tDiff % 2 == (absX + absY) % 2) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+}
+
+```
+
+</td>
+<td>
+
+![Java File-level](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/java.png)
+</td>
+</tr>
+<tr>
+<td>
+
+```bash
+comex --lang "cs" --code-file sample/example.cs --graphs "cfg,dfg"
+```
+
+```C#
+public class DFG_A2 {
+    public void main(string[] args) {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); // {}
+        String str = br.attribute1; // {3}
+        str = br.attribute2.method1(); // {3}
+        br.attribute1 = br.attribute2; // {3,5}
+        br.method2(br.attribute1, br.attribute2); // {3,5,6}
+        BufferedReader br2 = br; // {5,6,7}
+        br.method3(); // {5,6,7}
+        int j = br2.attribute1.method2(3,4); // {8}
+    }
+}
+```
+
+</td>
+<td>
+
+![C# Method-level](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/cs.png)
+</td>
+</tr>
+</table>
+
+More examples and results can be found in the [tests/data](https://github.com/IBM/tree-sitter-codeviews/tree/main/tests/data) directory
 
 ### Code Organization
 The code is structured in the following way:
