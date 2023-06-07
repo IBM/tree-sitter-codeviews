@@ -17,11 +17,11 @@ pp = pprint.PrettyPrinter(indent=4)
 system_type = ("Console", "System", "String")
 debug = False
 
-# if any(
-#         # GITHUB_ACTIONS
-#         x in os.environ for x in ("PYCHARM_HOSTED",)
-# ):
-#     debug = True
+if any(
+        # GITHUB_ACTIONS
+        x in os.environ for x in ("PYCHARM_HOSTED",)
+):
+    debug = True
 
 
 def scope_check(parent_scope, child_scope):
@@ -542,7 +542,7 @@ def get_required_edges_from_def_to_use(index, cfg, rda_solution, rda_table, grap
                     static_derive_class = all_classes[used.core]
                     fields = recursively_get_children_of_types(static_derive_class, "field_declaration")
                     for field in fields:
-                        field_pieces = st(field).split()
+                        field_pieces = st(field).replace(";", "").split()
                         if "static" in field_pieces:
                             if used.name.replace(used.core + ".", "") in field_pieces:
                                 processed_edges.append((get_index(field, index), node))
@@ -736,7 +736,7 @@ def dfg_csharp(properties, CFG_results):
             actual_variables = call_node.child_by_field_name("arguments").named_children
             virtual_variables = []
             for node in method.named_children:
-                if "formal_parameter" in node.type:
+                if "parameter" in node.type:
                     virtual_variables = recursively_get_children_of_types(node, variable_type, index=parser.index,
                                                                           stop_types=statement_types[
                                                                               "statement_holders"])
