@@ -34,9 +34,18 @@ def scope_check(parent_scope, child_scope):
 class Identifier:
     def __init__(self, parser, node, line=None, declaration=False, full_ref=None, method_call=False):
         self.core = st(node)
+        class_node = return_first_parent_of_types(node, "class_declaration")
         if full_ref is None:
             full_ref = node
+        self.parent_class = class_node
         self.unresolved_name = st(full_ref)
+        if self.unresolved_name.startswith("this."):
+            self.unresolved_name = st(full_ref)[5:]
+        if class_node is not None:
+            class_name = st(class_node.child_by_field_name("name"))
+            self.parent_class = class_name
+            if self.unresolved_name.startswith(class_name + "."):
+                self.unresolved_name = self.unresolved_name[len(class_name) + 1:]
         self.line = line
         self.declaration = declaration
         self.method_call = method_call
@@ -55,7 +64,18 @@ class Identifier:
             self.name = self.unresolved_name
         if not self.name:
             self.name = self.unresolved_name
-        self.scope = parser.symbol_table["scope_map"][get_index(node, parser.index)]
+        if node.type == "member_access_expression":
+            node = recursively_get_children_of_types(node, ['identifier'], index=parser.index,
+                                                                 check_list=parser.symbol_table["scope_map"])[-1]
+        variable_index = get_index(node, parser.index)
+        self.variable_scope = parser.symbol_table["scope_map"][variable_index]
+        if variable_index in parser.declaration_map:
+            self.scope = parser.symbol_table["scope_map"][parser.declaration_map[variable_index]]
+        else:
+            # self.scope = variable_scope
+            # Declaration does not exist hence it is given
+            # the outermost scope
+            self.scope = [0]
         if line is not None:
             self.real_line_no = read_index(parser.index, line)[0][0]
 
@@ -223,13 +243,12 @@ def add_entry(parser, rda_table, statement_id, used=None, defined=None, declarat
         rda_table[statement_id] = defaultdict(list)
     if not used and not defined:
         return
+    mapped_node = None
     if core is None:
         current_node = used or defined
         if current_node.type == "member_access_expression":
-            recurse_node = recursively_get_children_of_types(current_node, ['identifier'], index=parser.index,
-                                                             check_list=parser.symbol_table["scope_map"])
-            if recurse_node:
-                current_node = recurse_node[-1]
+            current_node = recursively_get_children_of_types(current_node, ['identifier'], index=parser.index,
+                                                             check_list=parser.symbol_table["scope_map"])[-1]
             if defined is not None:
                 defined = current_node
             else:
@@ -256,29 +275,60 @@ def add_entry(parser, rda_table, statement_id, used=None, defined=None, declarat
                     and current_node.parent.type == "invocation_expression"
             ):
                 if not st(current_node).startswith(system_type):
-                    add_entry(parser, rda_table, statement_id, defined=used or defined, core=current_node,
-                              declaration=True,
+                    if (used or defined).type == "identifier":
+                        method_cs = (used or defined).parent.named_children[0]
+                        # set_add(rda_table[statement_id]["def"],
+                        #         Identifier(parser, (used or defined).parent.named_children[0], statement_id, full_ref=None,
+                        #                    # declaration=True,
+                        #                    method_call=True))
+                    add_entry(parser, rda_table, statement_id, defined=used or defined, core=method_cs,
+                              # declaration=True,
                               method_call=True)
-                    add_entry(parser, rda_table, statement_id, used=used or defined, core=current_node,
-                              declaration=True,
+                    add_entry(parser, rda_table, statement_id, used=used or defined, core=method_cs,
+                              # declaration=True,
                               method_call=True)
+                if mapped_node is not None:
+                    set_add(rda_table[statement_id]["def"],
+                            Identifier(parser, mapped_node, statement_id, full_ref=mapped_node, declaration=declaration,
+                                       method_call=method_call))
                 return
             if defined is not None:
                 add_entry(parser, rda_table, statement_id, defined=defined, core=current_node, declaration=declaration,
                           method_call=method_call)
+                if mapped_node is not None:
+                    set_add(rda_table[statement_id]["def"],
+                            Identifier(parser, mapped_node, statement_id, full_ref=mapped_node, declaration=declaration,
+                                       method_call=method_call))
             else:
                 add_entry(parser, rda_table, statement_id, used=used, core=current_node, declaration=declaration,
                           method_call=method_call)
             return
+        elif current_node.next_sibling and current_node.next_sibling.type == "." and current_node.parent is not None and current_node.parent.type == "invocation_expression":
+            if not st(current_node).startswith(system_type):
+                if (used or defined).type == "identifier":
+                    set_add(rda_table[statement_id]["def"],
+                            Identifier(parser, used or defined, statement_id, full_ref=None,
+                                       # declaration=True,
+                                       method_call=True))
+    if st(core).startswith(system_type):
+        return
     if defined is not None:
         if get_index(defined, parser.index) not in parser.symbol_table["scope_map"]:
             return
         set_add(rda_table[statement_id]["def"],
                 Identifier(parser, defined, statement_id, full_ref=core, declaration=declaration,
                            method_call=method_call))
+        if mapped_node is not None:
+            set_add(rda_table[statement_id]["def"],
+                    Identifier(parser, mapped_node, statement_id, full_ref=mapped_node, declaration=declaration,
+                               method_call=method_call))
     else:
         if get_index(used, parser.index) not in parser.symbol_table["scope_map"]:
             return
+        if mapped_node is not None and method_call:
+            set_add(rda_table[statement_id]["def"],
+                    Identifier(parser, mapped_node, statement_id, full_ref=mapped_node, declaration=declaration,
+                               method_call=method_call))
         set_add(rda_table[statement_id]["use"],
                 Identifier(parser, used, full_ref=core, declaration=declaration, method_call=method_call))
 
@@ -316,7 +366,15 @@ def recursively_get_children_of_types(
         )
     else:
         result.extend(list(filter(lambda child: child.type in st_types, node.children)))
+        additional_cs = []
+        for n in result:
+            if node.type == "parameter" and n == n.parent.named_children[0]:
+                additional_cs.append(n)
+        for n in additional_cs:
+            result.remove(n)
     for child in node.named_children:
+        if node.type == "parameter" and child == node.named_children[0]:
+            continue
         if child in stop_types:
             continue
         if child.type not in st_types:
@@ -646,7 +704,7 @@ def dfg_csharp(properties, CFG_results):
     method_invocation = method_calls + ["object_creation_expression", "explicit_constructor_invocation"]
 
     call_variable_map = {}
-    handled_cases = ["switch_section", "local_declaration_statement"]
+    handled_cases = ["switch_section", "local_declaration_statement"] + ["class_declaration"]
 
     # if_statement = ["if_statement", "else"]
     # for_statement = ["for_statement"]
@@ -733,10 +791,13 @@ def dfg_csharp(properties, CFG_results):
                         # method = constructors[0]
                 else:
                     continue
-            actual_variables = call_node.child_by_field_name("arguments").named_children
+            actual_variables = recursively_get_children_of_types(call_node.child_by_field_name("arguments"), variable_type, index=parser.index,
+                                                                          stop_types=statement_types[
+                                                                              "statement_holders"])
+                # call_node.child_by_field_name("arguments")
             virtual_variables = []
             for node in method.named_children:
-                if "parameter" in node.type:
+                if "parameter_list" in node.type:
                     virtual_variables = recursively_get_children_of_types(node, variable_type, index=parser.index,
                                                                           stop_types=statement_types[
                                                                               "statement_holders"])
@@ -800,7 +861,7 @@ def dfg_csharp(properties, CFG_results):
             parent_id = get_index(root_node, index)
             if len(root_node.children) < 2:
                 continue
-            if root_node.children[1].type == "method_invocation":
+            if root_node.children[1].type == "invocation_expression":
                 continue
             identifiers_used = recursively_get_children_of_types(root_node, variable_type, index=parser.index,
                                                                  check_list=parser.symbol_table["scope_map"])
@@ -942,6 +1003,10 @@ def dfg_csharp(properties, CFG_results):
                 statement_types["non_control_statement"] + statement_types["control_statement"],
                 stop_types=['block'] + handled_types
             )
+            if parent_statement is None:
+                continue
+            if parent_statement.type in handled_cases:
+                continue
             parent_id = get_index(parent_statement, index)
             if parent_id is None:
                 continue
@@ -1025,8 +1090,9 @@ def dfg_csharp(properties, CFG_results):
                             edge_for = final_graph.edges[first_edge]["used_def"]
                             # get data for last edge
                             edge_for_last = final_graph.edges[last_edge]["used_def"]
-                            defined_cores = [d.core for d in rda_table[leaf]["def"]]
+                            defined_cores = [d.name for d in rda_table[leaf]["def"]]
                             call_node = None
+                            # print("cs:" + edge_for_last)
                             if edge_for_last not in defined_cores:
                                 # "method_return", "class_return"
                                 if any([x in final_graph.nodes[leaf] for x in ["method_call", "constructor_call"]]):
@@ -1049,8 +1115,10 @@ def dfg_csharp(properties, CFG_results):
                                         if abs(n - 1) > len(path):
                                             break
                                         last_edge = (path[n - 1], path[n], 0)
+                                        if "used_def" not in final_graph.edges[last_edge]:
+                                            continue
                                         edge_for_last = final_graph.edges[last_edge]["used_def"]
-                                        defined_cores = [d.core for d in rda_table[path[n]]["def"]]
+                                        defined_cores = [d.name for d in rda_table[path[n]]["def"]]
                                         if edge_for_last in defined_cores:
                                             al_analysis.add((node, path[n], edge_for, None))
                                 else:
@@ -1074,6 +1142,7 @@ def dfg_csharp(properties, CFG_results):
 
         for node, leaf, edge_for, call_node in al_analysis:
             mapped_node = call_variable(call_variable_map, node, edge_for)
+            # print(st(mapped_node))
             if mapped_node:
                 if mapped_node.type == "method_invocation":
                     # if a reference is passed back it is ignored in alias analysis
@@ -1081,6 +1150,7 @@ def dfg_csharp(properties, CFG_results):
                     #     track_leaf = leaf
                     #     leaf_node = node_list[read_index(index, track_leaf)]
                     #     if leaf_node.type == "return_statement":
+                    print("skipped")
                     continue
                 # [(st(a),st(b)) for a,b in call_variable_map[100]]
                 # print(edge_for, final_graph.nodes[leaf]["label"])

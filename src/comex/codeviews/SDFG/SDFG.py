@@ -31,8 +31,8 @@ class DfgRda:
             properties = {
                 "CFG": {},
                 "DFG": {
-                    "last_use": True,
-                    "last_def": True,
+                    "last_use": False,
+                    "last_def": False,
                     "alex_algo": True,
                 },
             }
