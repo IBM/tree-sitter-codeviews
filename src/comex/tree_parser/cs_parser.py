@@ -6,7 +6,7 @@ class CSParser(CustomParser):
         super().__init__(src_language, src_code)
 
     def check_declaration(self, current_node):
-        parent_types = ["variable_declarator", "catch_declaration"]
+        parent_types = ["variable_declarator", "catch_declaration", "parameter"]
         current_types = ["identifier"]
         if (
                 current_node.parent is not None
@@ -39,6 +39,18 @@ class CSParser(CustomParser):
                 # print("parent", parent_scope, "child", child_scope)
                 return False
         return True
+    
+    # TODO: Check correctness
+    def longest_scope_match(self, name_matches, symbol_table):
+        """Given a list of name matches, return the longest scope match"""
+        # [(ind, var), (ind,var)]
+        scope_array = list(map(lambda x: symbol_table['scope_map'][x[0]], name_matches))
+        # scope_array.sort(key=lambda x: len(x), reverse=True)
+        # index = max(range(len(scope_array)), key=lambda x: len(x))
+        max_val = max(scope_array, key=lambda x: len(x))
+        for i in range(len(scope_array)):
+            if scope_array[i] == max_val:
+                return name_matches[i][0]
 
     def create_all_tokens(
             self,
@@ -158,7 +170,10 @@ class CSParser(CustomParser):
                         current_node.parent is not None
                         and current_node.parent.type == "member_access_expression"
                 ):
-                    current_node = current_node.parent
+                    if current_node.parent.next_named_sibling is not None and current_node.parent.next_named_sibling.type == "argument_list":
+                        break
+                    else:
+                        current_node = current_node.parent
 
                 if (
                         current_node.parent is not None
@@ -167,7 +182,6 @@ class CSParser(CustomParser):
                     method_map.append(index)
                 label[index] = current_node.text.decode("UTF-8")
 
-            # Modify this to take care of scope
             if self.check_declaration(current_node):
                 variable_name = label[index]
                 declaration[index] = variable_name
@@ -177,15 +191,38 @@ class CSParser(CustomParser):
                     symbol_table["data_type"][index] = variable_type
             else:
                 current_scope = symbol_table['scope_map'][index]
-                for (ind, var) in declaration.items():
-                    if var == label[index]:
+                if current_node.type == "member_access_expression":
+                    field_variable = current_node.children[-1]
+                    # entire_variable_name = current_node.text.decode('utf-8')
+                    field_variable_name = field_variable.text.decode('utf-8')
+                    
+                    for (ind,var) in declaration.items():
+                        if var == field_variable_name:
+                            parent_scope = symbol_table['scope_map'][ind]
+                            if self.scope_check(parent_scope, current_scope):
+                                declaration_map[index] = ind
+                                break
+                else:
+                    name_matches = []
+                    for (ind, var) in declaration.items():
+                        if var == label[index]:
+                            parent_scope = symbol_table['scope_map'][ind]
+                            if self.scope_check(parent_scope, current_scope):
+                                name_matches.append((ind,var))
+                    for (ind, var) in name_matches:
                         parent_scope = symbol_table['scope_map'][ind]
-                        # print(ind,var)
-                        if self.scope_check(parent_scope, current_scope):
-                            # print(ind, var)
-                            # print("^^", current_node.parent.type, index, var, "Current:", current_scope, "Parent:", parent_scope)
-                            declaration_map[index] = ind
-                            break
+                        closest_index = self.longest_scope_match(name_matches, symbol_table)
+                        declaration_map[index] = closest_index
+                        break
+                    # for (ind, var) in declaration.items():
+                    #     if var == label[index]:
+                    #         parent_scope = symbol_table['scope_map'][ind]
+                    #         # print(ind,var)
+                    #         if self.scope_check(parent_scope, current_scope):
+                    #             # print(ind, var)
+                    #             # print("^^", current_node.parent.type, index, var, "Current:", current_scope, "Parent:", parent_scope)
+                    #             declaration_map[index] = ind
+                    #             break
 
         else:
             for child in root_node.children:

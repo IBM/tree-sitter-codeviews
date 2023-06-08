@@ -375,7 +375,20 @@ class CFGGraph_csharp(CFGGraph):
 
     # TODO: Check correctness of the next 3 functions
     def get_class_name(self, node):
-        reference_node = node.child_by_field_name("object")
+        reference_node = node.child_by_field_name("function")
+        if reference_node is not None:
+            try:
+                reference_node = list(filter(lambda child: child.type == "member_access_expression", reference_node.children))[0]
+        #     # reference_node = list(filter(lambda child: child.type == "member_access_expression", node.children))[0]
+        #     reference_node = list(filter(lambda child: child.type == "member_access_expression", reference_node.children))[0]
+            except:
+                try:
+                    reference_node = list(filter(lambda child: child.type == "identifier", reference_node.children))[0]
+                except:
+                    reference_node = None
+            #     print(reference_node)
+            #     pass
+                
         types = ["scoped_type_identifier", "type_identifier", "generic_type"]
         if reference_node is None or reference_node.type == "this":
             while node is not None:
@@ -391,14 +404,18 @@ class CFGGraph_csharp(CFGGraph):
                     class_name = list(filter(lambda child: child.type == "identifier", node.children))[0]
                     class_name = [class_name.text.decode("UTF-8")]
                 node = node.parent
-            try:
-                class_name += self.records['extends'][class_name[0]]
-            except:
-                class_name = "Unknown"
-                pass
+
+            if class_name is None:
+                class_name = ["Unknown"]
+            # try:
+            #     class_name += self.records['extends'][class_name[0]]
+            # except:
+            #     class_name = ["Unknown"]
+            #     pass
             return class_name
         try:
             reference_index = self.get_index(reference_node)
+            # reference_node = reference_node.text.decode("UTF-8").split(".")[0:-1]
             declaration_index = self.declaration_map[reference_index]
             class_name = [self.symbol_table["data_type"][declaration_index]]
             try:
@@ -576,8 +593,8 @@ class CFGGraph_csharp(CFGGraph):
             argument_list = list(filter(lambda child: child.is_named, argument_list.children))
             # print(argument_list)
             signature = self.get_signature(argument_list)
-
             class_name_list = self.get_class_name(current_node)
+            # print(class_name_list)
             if class_name_list is None:
                 method_name = (None, base_method_name)
                 function_key = (method_name, signature)

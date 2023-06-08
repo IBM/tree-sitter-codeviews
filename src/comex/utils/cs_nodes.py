@@ -12,6 +12,7 @@ class_declaration_statements = [
     "class_declaration",
     "field_declaration",
     "struct_declaration",
+    "local_function_statement",
     
 ]
 
@@ -118,10 +119,23 @@ def get_signature(node):
     signature = []
     formal_parameters = node.child_by_field_name('parameters')
     formal_parameters = list(filter(lambda x: x.type == 'parameter', formal_parameters.named_children))
+    # for formal_parameter in formal_parameters:
+    #     for child in formal_parameter.children:
+    #         if child.type != "identifier":
+    #             signature.append(child.text.decode('utf-8'))\
     for formal_parameter in formal_parameters:
-        for child in formal_parameter.children:
-            if child.type != "identifier":
-                signature.append(child.text.decode('utf-8'))
+        param_type = formal_parameter.child_by_field_name('type')
+        if param_type is None:
+            try:
+                param_type = list(filter(lambda x: x.type == 'identifier', formal_parameter.named_children))[0]
+                signature.append(param_type.text.decode('utf-8'))
+            except:
+                pass
+        else:
+            signature.append(param_type.text.decode('utf-8'))
+        # for child in formal_parameter.children:
+        #     if child.type != "identifier":
+        #         signature.append(child.text.decode('utf-8'))
     return tuple(signature)
 
 def abstract_method(node):

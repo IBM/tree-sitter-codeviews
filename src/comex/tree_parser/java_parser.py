@@ -147,8 +147,7 @@ class JavaParser(CustomParser):
             else:
                 current_scope = symbol_table['scope_map'][index]
 
-                if current_node.type == "field_access":
-                    
+                if current_node.type == "field_access":   
                     field_variable = current_node.children[-1]
                     # entire_variable_name = current_node.text.decode('utf-8')
                     field_variable_name = field_variable.text.decode('utf-8')
