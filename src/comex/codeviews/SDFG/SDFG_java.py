@@ -34,11 +34,11 @@ system_type = ("Console", "System", "String", "Collections")
 # call_variable_map = {}
 # node_list = {}
 debug = False
-if any(
-        # GITHUB_ACTIONS
-        x in os.environ for x in ("PYCHARM_HOSTED",)
-):
-    debug = True
+# if any(
+#         # GITHUB_ACTIONS
+#         x in os.environ for x in ("PYCHARM_HOSTED",)
+# ):
+#     debug = True
 # properties = {
 #     "last_use": False,
 #     "last_def": False,
@@ -1233,7 +1233,7 @@ def dfg_java(prop, CFG_results):
                     #     track_leaf = leaf
                     #     leaf_node = node_list[read_index(index, track_leaf)]
                     #     if leaf_node.type == "return_statement":
-                    print("skipped")
+                    # print("skipped")
                     continue
                 # [(st(a),st(b)) for a,b in call_variable_map[100]]
                 # print(edge_for, final_graph.nodes[leaf]["label"])
