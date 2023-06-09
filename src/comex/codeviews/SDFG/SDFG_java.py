@@ -1,6 +1,7 @@
 import copy
 import pprint
 import time
+import os
 from collections import defaultdict
 
 import networkx as nx
@@ -34,10 +35,6 @@ system_type = ("Console", "System", "String", "Collections")
 # node_list = {}
 debug = False
 # if any(
-#         # GITHUB_ACTIONS
-#         x in os.environ for x in ("PYCHARM_HOSTED",)
-# ):
-#     debug = any(
 #         # GITHUB_ACTIONS
 #         x in os.environ for x in ("PYCHARM_HOSTED",)
 # ):
@@ -1180,6 +1177,7 @@ def dfg_java(prop, CFG_results):
                             edge_for_last = final_graph.edges[last_edge]["used_def"]
                             defined_cores = [d.core for d in rda_table[leaf]["def"]]
                             call_node = None
+                            # print("java:" + edge_for_last)
                             if edge_for_last not in defined_cores:
                                 # "method_return", "class_return"
                                 if any([x in final_graph.nodes[leaf] for x in ["method_call", "constructor_call"]]):
@@ -1227,6 +1225,7 @@ def dfg_java(prop, CFG_results):
 
         for node, leaf, edge_for, call_node in al_analysis:
             mapped_node = call_variable(call_variable_map, node, edge_for)
+            # print(st(mapped_node))
             if mapped_node:
                 if mapped_node.type == "method_invocation":
                     # if a reference is passed back it is ignored in alias analysis
@@ -1234,6 +1233,7 @@ def dfg_java(prop, CFG_results):
                     #     track_leaf = leaf
                     #     leaf_node = node_list[read_index(index, track_leaf)]
                     #     if leaf_node.type == "return_statement":
+                    # print("skipped")
                     continue
                 # [(st(a),st(b)) for a,b in call_variable_map[100]]
                 # print(edge_for, final_graph.nodes[leaf]["label"])

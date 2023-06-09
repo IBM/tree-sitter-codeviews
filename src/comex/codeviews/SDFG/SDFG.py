@@ -110,8 +110,6 @@ if __name__ == '__main__':
 
     # "cs",
     for extension in ("java", "cs"):
-        if extension == "java":
-            continue
         file = f"data/test_manual.{extension}"
         if not os.path.isfile(file):
             continue
