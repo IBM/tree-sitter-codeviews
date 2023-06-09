@@ -1,13 +1,13 @@
 # Tree Sitter Multi Codeview Generator
 
-Tree Sitter Multi Codeview Generator aims to generate combined multi-code view graphs that can be used with various types of machine learning models (sequence model neural networks, graph neural networks, etc). It is also designed to be easily extended to various source code languages. [tree-sitter](https://tree-sitter.github.io/tree-sitter/) is used for parsing which is highly efficient and has support for over 40+ languages. Currently, this repository supports codeviews for Java in over 40 possible combinations of codeviews. It has been structured such that support for other languages can be easily added. If you wish to add support for more languages, please refer to the [contributing](https://github.com/IBM/tree-sitter-codeviews/blob/main/CONTRIBUTING.md) guide.
+Tree Sitter Multi Codeview Generator aims to generate combined multi-code view graphs that can be used with various types of machine learning models (sequence models, graph neural networks, etc). 
 
-## Comex
-`comex` is a rebuild of Tree Sitter Multi Codeview Generator for easier invocation as a Python package. 
-This rebuild also includes a cli interface for easier usage.
-It isolates the logic pertaining to the generation and combination of codeviews to better differentiate tasks involved in the `IBM OSCP Project`.
+# Comex
+`comex` is a rebuild of Tree Sitter Multi Codeview Generator for easier invocation as a Python package. This rebuild also includes a cli interface. Currently, ```comex``` generates codeviews for Java and C#, for both method-level and file-level code snippets.  ```comex``` can be used to generate over $15$ possible combinations of codeviews for both languages (complete list [here](https://github.com/IBM/tree-sitter-codeviews/blob/main/List_Of_Views.pdf)). ```comex``` is designed to be easily extendable to various programming languages. This is primarliy because we use [tree-sitter](https://tree-sitter.github.io/tree-sitter/) for parsing, a highly efficient incremental parser that supports over $40$ languages. If you wish to add support for more languages, please refer to the [contributing](https://github.com/IBM/tree-sitter-codeviews/blob/main/CONTRIBUTING.md) guide.
 
-### Installation
+**Note**: While C# _method-level_ support is available on the ```main``` branch, _file-level_ support is available on the ```dev``` branch but is currently under active development and testing.
+
+## Installation from PyPi
 
 `comex` is published on the Python Registry and can be easily installed via pip:
 
@@ -17,15 +17,12 @@ pip install comex
 
 **Note**: You would need to install GraphViz([dot](https://graphviz.org/download/)) so that the graph visualizations are generated
 
----
+## Installation from source
+
 To setup `comex` for development using the source code in your python environment:
 
 ```console
 pip install -r requirements-dev.txt
-```
-**Note**: Please clone recursively so sub-modules are setup correctly
-```console
-git clone --recursive {...}
 ```
 
 This performs an editable install, meaning that comex would be available throughout your environment (particularly relevant if you use conda or something of the sort). This means now you can interact and import from `comex` just like any other package while remaining standalone but also reflecting any code side updates without any other manual steps
@@ -74,12 +71,136 @@ graph_format: denotes the format of the output graph. Currently supported format
 codeviews: refers to the configuration passed for each codeview
 ````
 
-### Output Example:
+### Output Examples:
 
 Combined simple AST+CFG+DFG for a simple Java program that finds the maximum among 2 numbers:
 
-<img src="https://github.com/IBM/tree-sitter-codeviews/raw/main/sample.png" >
+![Sample AST CFG DFG](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/sample.png)
 
+Below we present more examples of input code snippets and generated codeviews for both Java and C#.
+
+---
+
+**CLI Command**:
+
+```bash
+comex --lang "java" --code-file sample/example.java --graphs "cfg,dfg"
+```
+---
+
+**Java Code Snippet**:
+
+```Java
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+    //    static String INPUT = "5\n3 2 2 4 1\n1 2 2 2 1";
+    static String INPUT = "";
+
+    public static void main(String[] args) {
+        InputStream is = INPUT.isEmpty() ? System.in : new ByteArrayInputStream(INPUT.getBytes());
+
+        Scanner scanner = new Scanner(is);
+
+        final int n = scanner.nextInt();
+        List<Position> positionList = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            positionList.add(
+                    new Position(
+                            scanner.nextInt(),
+                            scanner.nextInt(),
+                            scanner.nextInt()
+                    )
+            );
+        }
+
+        System.out.println(solve(positionList) ? "Yes" : "No");
+    }
+
+    static class Position {
+        int t;
+        int x;
+        int y;
+
+        public Position(int t, int x, int y) {
+            this.t = t;
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    static boolean solve(List<Position> positionList) {
+        Position currentPosition = new Position(0, 0, 0);
+        for (int i = 0; i < positionList.size(); i++) {
+            Position nextPosition = positionList.get(i);
+            if (!possibleMove(currentPosition.t, nextPosition.t, currentPosition.x, nextPosition.x, currentPosition.y, nextPosition.y)) {
+                return false;
+            }
+            currentPosition = nextPosition;
+        }
+        return true;
+    }
+
+    static boolean possibleMove(int t1, int t2, int x1, int x2, int y1, int y2) {
+        int tDiff = t2 - t1;
+        int absX = Math.abs(x1 - x2);
+        int absY = Math.abs(y1 - y2);
+
+        if (absX + absY <= tDiff) {
+            if (tDiff % 2 == (absX + absY) % 2) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+}
+
+```
+---
+
+**Generated Codeview**:
+
+![Java File-level](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/java.png)
+
+---
+
+**CLI Command**:
+
+```bash
+comex --lang "cs" --code-file sample/example.cs --graphs "cfg,dfg"
+```
+---
+
+**C# Code Snippet**:
+
+```C#
+public class DFG_A2 {
+    public void main(string[] args) {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); // {}
+        String str = br.attribute1; // {3}
+        str = br.attribute2.method1(); // {3}
+        br.attribute1 = br.attribute2; // {3,5}
+        br.method2(br.attribute1, br.attribute2); // {3,5,6}
+        BufferedReader br2 = br; // {5,6,7}
+        br.method3(); // {5,6,7}
+        int j = br2.attribute1.method2(3,4); // {8}
+    }
+}
+```
+---
+
+**Generated Codeview**:
+
+![C# Method-level](https://github.com/IBM/tree-sitter-codeviews/raw/main/sample/cs.png)
+
+---
+
+More examples and results can be found in the [tests/data](https://github.com/IBM/tree-sitter-codeviews/tree/main/tests/data) directory
 
 ### Code Organization
 The code is structured in the following way:
