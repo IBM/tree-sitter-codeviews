@@ -26,17 +26,9 @@ jobs:
     - name: Install Dependencies and Run Tests
       run: |
         pip install -r requirements-dev.txt
-        set -o pipefail
         pytest --cov=src \
                --junitxml=pytest.xml \
                --capture=tee-sys \
                --cov-report=term-missing:skip-covered \
                tests | \
         tee pytest-coverage.txt
-
-    - name: Pytest coverage comment
-      if: always()
-      uses: MishaKav/pytest-coverage-comment@main
-      with:
-        pytest-coverage-path: ./pytest-coverage.txt
-        junitxml-path: ./pytest.xml
