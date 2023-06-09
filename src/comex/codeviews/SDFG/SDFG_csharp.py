@@ -17,11 +17,11 @@ pp = pprint.PrettyPrinter(indent=4)
 system_type = ("Console", "System", "String")
 debug = False
 
-if any(
-        # GITHUB_ACTIONS
-        x in os.environ for x in ("PYCHARM_HOSTED",)
-):
-    debug = True
+# if any(
+#         # GITHUB_ACTIONS
+#         x in os.environ for x in ("PYCHARM_HOSTED",)
+# ):
+#     debug = True
 
 
 def scope_check(parent_scope, child_scope):
@@ -64,9 +64,10 @@ class Identifier:
             self.name = self.unresolved_name
         if not self.name:
             self.name = self.unresolved_name
-        if node.type == "member_access_expression":
-            node = recursively_get_children_of_types(node, ['identifier'], index=parser.index,
-                                                                 check_list=parser.symbol_table["scope_map"])[-1]
+        if node.parent.type == "member_access_expression":
+            og_node = node.parent
+            node = recursively_get_children_of_types(og_node, ['identifier'], index=parser.index,
+                                                                 check_list=parser.symbol_table["scope_map"])[0]
         variable_index = get_index(node, parser.index)
         self.variable_scope = parser.symbol_table["scope_map"][variable_index]
         if variable_index in parser.declaration_map:
@@ -1150,7 +1151,7 @@ def dfg_csharp(properties, CFG_results):
                     #     track_leaf = leaf
                     #     leaf_node = node_list[read_index(index, track_leaf)]
                     #     if leaf_node.type == "return_statement":
-                    print("skipped")
+                    # print("skipped")
                     continue
                 # [(st(a),st(b)) for a,b in call_variable_map[100]]
                 # print(edge_for, final_graph.nodes[leaf]["label"])
