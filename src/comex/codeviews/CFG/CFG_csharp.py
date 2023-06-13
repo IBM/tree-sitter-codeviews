@@ -466,6 +466,7 @@ class CFGGraph_csharp(CFGGraph):
             "character_literal": "char",
             "string_literal": "String",
             "decimal_integer_literal": "int",
+            "integer_literal": "int",
             "boolean": "boolean",
             "decimal_floating_point_literal": "double",  # If float, won't work
         }
