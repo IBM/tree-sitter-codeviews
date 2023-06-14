@@ -128,14 +128,22 @@ def get_signature(node):
         if param_type is None:
             try:
                 param_type = list(filter(lambda x: x.type == 'identifier', formal_parameter.named_children))[0]
-                signature.append(param_type.text.decode('utf-8'))
+                param_text = param_type.text.decode('utf-8')
+                if '[]' in param_text:
+                    param_text = param_text.split('[',1)
+                    param_text = " [".join(param_text)
+                signature.append(param_text)
             except:
                 pass
         else:
-            signature.append(param_type.text.decode('utf-8'))
-        # for child in formal_parameter.children:
-        #     if child.type != "identifier":
-        #         signature.append(child.text.decode('utf-8'))
+            param_text = param_type.text.decode('utf-8')
+            if '[]' in param_text:
+                param_text = param_text.split('[',1)
+                # print(param_text)
+                param_text = " [".join(param_text)
+                # print(param_text)
+            signature.append(param_text)
+
     return tuple(signature)
 
 def abstract_method(node):
