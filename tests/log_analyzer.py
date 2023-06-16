@@ -11,6 +11,11 @@ directory = sys.argv[1]
 logs = {}
 samples = {}
 
+if "java" in directory:
+    lang = "java"
+else:
+    lang = "cs"
+
 for file in glob.glob(directory + "/*.log"):
     with open(file, "r") as f:
         lines = f.readlines()
@@ -24,10 +29,11 @@ for file in glob.glob(directory + "/*.log"):
             # write filename without extension to a file timeout.txt
             with open("timeout.txt", "a") as f:
                 f.write(file.split("/")[-1].rsplit('.', 1)[0] + ", ")
+        category = f"classified_logs/{category}"
         if not os.path.exists(category):
             os.makedirs(category)
         os.system(f"cp {file} {category}")
-        os.system(f"cp {file.rsplit('.',1)[0]}.java {category}")
+        os.system(f"cp {file.rsplit('.',1)[0]}.{lang} {category}")
         if category in logs:
             logs[category] += 1
         else:

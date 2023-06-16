@@ -46,7 +46,7 @@ class Dataset:
             else:
                 with open(file, "r") as f:
                     self.lines = f.read().splitlines()
-        self.kind = ""
+        self.kind = kind
         self.driver = None
         self.graph = {}
         self.ignore = ignore
@@ -172,6 +172,7 @@ class Dataset:
             # #     logger.error("AP1: Missing edge: {}", ind)
             # #     AP1 = AP1 + 1
             # #     continue
+            self.manual_check(ind, prefix=self.extension + "-SUCCESS", formats="dot", actual_src=actual_src, type=self.kind)
             return "success"
         except Exception as e:
             logger.error("FAIL: ID: {} | Error: {}", ind, e)

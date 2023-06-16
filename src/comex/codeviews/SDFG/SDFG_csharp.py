@@ -1,3 +1,5 @@
+import os
+import time
 from collections import defaultdict
 import copy
 
@@ -14,11 +16,13 @@ from loguru import logger
 pp = pprint.PrettyPrinter(indent=4)
 system_type = ("Console", "System", "String")
 debug = False
+
 # if any(
-#     # GITHUB_ACTIONS
-#     x in os.environ for x in ("PYCHARM_HOSTED",)
+#         # GITHUB_ACTIONS
+#         x in os.environ for x in ("PYCHARM_HOSTED",)
 # ):
 #     debug = True
+
 
 def scope_check(parent_scope, child_scope):
     for p in parent_scope:
@@ -30,9 +34,18 @@ def scope_check(parent_scope, child_scope):
 class Identifier:
     def __init__(self, parser, node, line=None, declaration=False, full_ref=None, method_call=False):
         self.core = st(node)
+        class_node = return_first_parent_of_types(node, "class_declaration")
         if full_ref is None:
             full_ref = node
+        self.parent_class = class_node
         self.unresolved_name = st(full_ref)
+        if self.unresolved_name.startswith("this."):
+            self.unresolved_name = st(full_ref)[5:]
+        if class_node is not None:
+            class_name = st(class_node.child_by_field_name("name"))
+            self.parent_class = class_name
+            if self.unresolved_name.startswith(class_name + "."):
+                self.unresolved_name = self.unresolved_name[len(class_name) + 1:]
         self.line = line
         self.declaration = declaration
         self.method_call = method_call
@@ -51,7 +64,19 @@ class Identifier:
             self.name = self.unresolved_name
         if not self.name:
             self.name = self.unresolved_name
-        self.scope = parser.symbol_table["scope_map"][get_index(node, parser.index)]
+        if node.parent.type == "member_access_expression":
+            og_node = node.parent
+            node = recursively_get_children_of_types(og_node, ['identifier'], index=parser.index,
+                                                                 check_list=parser.symbol_table["scope_map"])[0]
+        variable_index = get_index(node, parser.index)
+        self.variable_scope = parser.symbol_table["scope_map"][variable_index]
+        if variable_index in parser.declaration_map:
+            self.scope = parser.symbol_table["scope_map"][parser.declaration_map[variable_index]]
+        else:
+            # self.scope = variable_scope
+            # Declaration does not exist hence it is given
+            # the outermost scope
+            self.scope = [0]
         if line is not None:
             self.real_line_no = read_index(parser.index, line)[0][0]
 
@@ -122,7 +147,7 @@ def parent_remapping_callback(node):
     if node is None:
         return None
     elif node.type == "do_statement":
-        return None
+        return node.named_children[-1]
     elif node.type == "try_statement":
         return None
         # while_node = None
@@ -219,13 +244,12 @@ def add_entry(parser, rda_table, statement_id, used=None, defined=None, declarat
         rda_table[statement_id] = defaultdict(list)
     if not used and not defined:
         return
+    mapped_node = None
     if core is None:
         current_node = used or defined
         if current_node.type == "member_access_expression":
-            recurse_node = recursively_get_children_of_types(current_node, ['identifier'], index=parser.index,
-                                                             check_list=parser.symbol_table["scope_map"])
-            if recurse_node:
-                current_node = recurse_node[-1]
+            current_node = recursively_get_children_of_types(current_node, ['identifier'], index=parser.index,
+                                                             check_list=parser.symbol_table["scope_map"])[-1]
             if defined is not None:
                 defined = current_node
             else:
@@ -252,24 +276,60 @@ def add_entry(parser, rda_table, statement_id, used=None, defined=None, declarat
                     and current_node.parent.type == "invocation_expression"
             ):
                 if not st(current_node).startswith(system_type):
-                    add_entry(parser, rda_table, statement_id, defined=used or defined, core=current_node, declaration=True,
+                    if (used or defined).type == "identifier":
+                        method_cs = (used or defined).parent.named_children[0]
+                        # set_add(rda_table[statement_id]["def"],
+                        #         Identifier(parser, (used or defined).parent.named_children[0], statement_id, full_ref=None,
+                        #                    # declaration=True,
+                        #                    method_call=True))
+                    add_entry(parser, rda_table, statement_id, defined=used or defined, core=method_cs,
+                              # declaration=True,
                               method_call=True)
-                    add_entry(parser, rda_table, statement_id, used=used or defined, core=current_node, declaration=True,
+                    add_entry(parser, rda_table, statement_id, used=used or defined, core=method_cs,
+                              # declaration=True,
                               method_call=True)
+                if mapped_node is not None:
+                    set_add(rda_table[statement_id]["def"],
+                            Identifier(parser, mapped_node, statement_id, full_ref=mapped_node, declaration=declaration,
+                                       method_call=method_call))
                 return
             if defined is not None:
-                add_entry(parser, rda_table, statement_id, defined=defined, core=current_node, declaration=declaration, method_call=method_call)
+                add_entry(parser, rda_table, statement_id, defined=defined, core=current_node, declaration=declaration,
+                          method_call=method_call)
+                if mapped_node is not None:
+                    set_add(rda_table[statement_id]["def"],
+                            Identifier(parser, mapped_node, statement_id, full_ref=mapped_node, declaration=declaration,
+                                       method_call=method_call))
             else:
-                add_entry(parser, rda_table, statement_id, used=used, core=current_node, declaration=declaration, method_call=method_call)
+                add_entry(parser, rda_table, statement_id, used=used, core=current_node, declaration=declaration,
+                          method_call=method_call)
             return
+        elif current_node.next_sibling and current_node.next_sibling.type == "." and current_node.parent is not None and current_node.parent.type == "invocation_expression":
+            if not st(current_node).startswith(system_type):
+                if (used or defined).type == "identifier":
+                    set_add(rda_table[statement_id]["def"],
+                            Identifier(parser, used or defined, statement_id, full_ref=None,
+                                       # declaration=True,
+                                       method_call=True))
+    if st(core).startswith(system_type):
+        return
     if defined is not None:
         if get_index(defined, parser.index) not in parser.symbol_table["scope_map"]:
             return
         set_add(rda_table[statement_id]["def"],
-                Identifier(parser, defined, statement_id, full_ref=core, declaration=declaration, method_call=method_call))
+                Identifier(parser, defined, statement_id, full_ref=core, declaration=declaration,
+                           method_call=method_call))
+        if mapped_node is not None:
+            set_add(rda_table[statement_id]["def"],
+                    Identifier(parser, mapped_node, statement_id, full_ref=mapped_node, declaration=declaration,
+                               method_call=method_call))
     else:
         if get_index(used, parser.index) not in parser.symbol_table["scope_map"]:
             return
+        if mapped_node is not None and method_call:
+            set_add(rda_table[statement_id]["def"],
+                    Identifier(parser, mapped_node, statement_id, full_ref=mapped_node, declaration=declaration,
+                               method_call=method_call))
         set_add(rda_table[statement_id]["use"],
                 Identifier(parser, used, full_ref=core, declaration=declaration, method_call=method_call))
 
@@ -307,7 +367,15 @@ def recursively_get_children_of_types(
         )
     else:
         result.extend(list(filter(lambda child: child.type in st_types, node.children)))
+        additional_cs = []
+        for n in result:
+            if n.type == "parameter" and n == n.parent.named_children[0]:
+                additional_cs.append(n)
+        for n in additional_cs:
+            result.remove(n)
     for child in node.named_children:
+        if node.type == "parameter" and child == node.named_children[0]:
+            continue
         if child in stop_types:
             continue
         if child.type not in st_types:
@@ -339,22 +407,34 @@ def print_table(index, new_result, iteration=0):
     table = [f"\nRDA: iteration {iteration}\n"]
     for key in new_result:
         try:
-            table.append(str(read_index(index, key)[0][0]+1)+"\n")
+            table.append(str(read_index(index, key)[0][0] + 1) + "\n")
         except:
-            table.append(str(key)+"\n")
+            table.append(str(key) + "\n")
         for key2 in new_result[key]:
             table.append(f"\t{key2}:")
             for entry in new_result[key][key2]:
-                table.append(str(entry)+",")
+                table.append(str(entry) + ",")
             table.append("\n")
     logger.debug("".join(table))
 
 
-def start_rda(index, rda_table, CFG_results):
-    if debug:
+def start_rda(index, rda_table, graph, pre_solve=False):
+    if debug and not pre_solve:
         print_table(index, rda_table)
-    cfg = CFG_results.graph
-    nodes = CFG_results.graph.nodes
+    remove_set = []
+    # "method_return", "class_return"
+    if pre_solve:
+        remove_set = ["method_call", "method_return", "class_return", "constructor_call"]
+    graph = copy.deepcopy(graph)
+    remove_edges = []
+    if remove_set:
+        for edge in graph.edges:
+            if "label" in graph.edges[edge] and graph.edges[edge]["label"] in remove_set:
+                remove_edges.append(edge)
+        graph.remove_edges_from(remove_edges)
+
+    cfg = graph
+    nodes = graph.nodes
     old_result = {}
     iteration = 0
     for node in nodes:
@@ -368,21 +448,50 @@ def start_rda(index, rda_table, CFG_results):
     new_result = copy.deepcopy(old_result)
     while True:
         iteration = iteration + 1
+        iteration_returners = {}
         for node in nodes:
-            connected_feeders = [s for (s, t) in cfg.in_edges(node)]
+            connected_feeders = []
+            returning_feeders = []
+            for (s, t) in cfg.in_edges(node):
+                if "label" in cfg.edges[s, t, 0] and cfg.edges[s, t, 0]["label"] in ["method_return", "class_return"]:
+                    returning_feeders.append(s)
+                else:
+                    connected_feeders.append(s)
             feeder_union = set()
+            returner_union = set()
             for feeder in connected_feeders:
                 feeder_union = feeder_union.union(old_result[feeder]["OUT"])
+            for returner in returning_feeders:
+                returner_union = returner_union.union(old_result[returner]["OUT"])
+            for (s, t) in cfg.out_edges(node):
+                if s != t:
+                    iteration_returners[t] = iteration_returners[t].union(
+                        returner_union) if t in iteration_returners else returner_union
             new_result[node]["IN"] = feeder_union
             def_info = rda_table[node]["def"] if node in rda_table else set()
             names_defined = [defined.name for defined in def_info]
+            # if defined.param_declaration is None
             selective_difference = set()
             for already_defined in feeder_union:
+                # if already_defined.immutable_declaration:
+                #     selective_difference.add(already_defined)
                 if already_defined.name in names_defined:
                     continue
                 else:
                     selective_difference.add(already_defined)
             new_result[node]["OUT"] = selective_difference.union(def_info)
+        for node in iteration_returners:
+            def_info = rda_table[node]["def"] if node in rda_table else set()
+            names_defined = [defined.name for defined in def_info]
+            selective_difference = set()
+            for already_defined in iteration_returners[node]:
+                # if already_defined.immutable_declaration:
+                #     selective_difference.add(already_defined)
+                if already_defined.name in names_defined:
+                    continue
+                else:
+                    selective_difference.add(already_defined)
+            new_result[node]["OUT"] = new_result[node]["OUT"].union(selective_difference)
         ddiff = DeepDiff(
             old_result,
             new_result,
@@ -403,7 +512,7 @@ def start_rda(index, rda_table, CFG_results):
             #         for incoming in new_result[deriver]["IN"]:
             #             if incoming in rda_table[node]["def"]:
             #                 continue
-            if debug:
+            if debug and not pre_solve:
                 logger.info("RDA: Completed in iteration {}", iteration)
                 print_table(index, new_result, iteration)
             break
@@ -418,8 +527,28 @@ def add_edge(final_graph, a, b, attrib=None, pre_solve=False):
             nx.set_edge_attributes(final_graph, {(a, b, 0): attrib})
 
 
-def get_required_edges_from_def_to_use(index, cfg, rda_solution, rda_table, graph_nodes, properties=None):
+def get_required_edges_from_def_to_use(index, cfg, rda_solution, rda_table, graph_nodes, all_classes,
+                                       additional_edges=None, processed_edges=None, pre_solve=False, properties=None):
+    if additional_edges is None:
+        additional_edges = []
+    if processed_edges is None:
+        processed_edges = []
     final_graph = copy.deepcopy(cfg)
+    # twin_edges = [
+    #     "constructor_call", "method_call"
+    # ]
+    # twins = []
+    # retain_edges = [
+    #     "constructor_call", "class_return", "method_call", "method_return"
+    # ]
+    # retains = []
+    # additional_edges = []
+    # for edge in list(final_graph.edges()):
+    #     edge_data = final_graph.get_edge_data(*edge)[0]
+    #     if edge_data["label"] in retain_edges:
+    #         retains.append(edge)
+    #     # if edge_data["label"] in twin_edges:
+    #     #     twins.append(edge)
     final_graph.remove_edges_from(list(final_graph.edges()))
     for node in graph_nodes:
         rda_info = rda_table[node] if node in rda_table else None
@@ -433,14 +562,25 @@ def get_required_edges_from_def_to_use(index, cfg, rda_solution, rda_table, grap
         for used in use_info:
             for available_def in rda_solution[node]["IN"]:
                 if available_def.name == used.name:
+                    # if available_def not in rda_solution[node]["OUT"]:
+                    #     for line_def in rda_table[node]["def"]:
+                    #         if line_def.name == available_def.name:
+                    #             if line_def.declaration:
+                    #                 available_def = line_def
                     # if available_def in rda_table[available_def.line]["def"]:
-                    if available_def.declaration:
-                        if scope_check(available_def.scope, used.scope):
-                            add_edge(final_graph, available_def.line, node)
-                            used.satisfied = True
-                    else:
-                        add_edge(final_graph, available_def.line, node)
+                    if scope_check(available_def.scope, used.scope):
+                        # if available_def.declaration:
+                        # if available_def.immutable_declaration:
+                        #     for other_def in rda_solution[node]["IN"]:
+                        #         if other_def.name == available_def.name and other_def.param_declaration:
+                        #             if not used.core.startswith("this"):
+                        #                 available_def = other_def
+                        #             break
+                        add_edge(final_graph, available_def.line, node, {'used_def': f"'{used.name}'"}, pre_solve)
                         used.satisfied = True
+                    # else:
+                    #         add_edge(final_graph, available_def.line, node, {'used_def': used.name}, pre_solve)
+                    #         used.satisfied = True
                 elif "." in used.name or "." in available_def.name:
                     if len(used.name.split(".")) < len(available_def.name.split(".")):
                         smaller = used
@@ -453,20 +593,36 @@ def get_required_edges_from_def_to_use(index, cfg, rda_solution, rda_table, grap
                             continue
 
                         # add_edge(final_graph, bigger.line or node, smaller.line or node)
-                        add_edge(final_graph, available_def.line or node, used.line or node)
+                        add_edge(final_graph, available_def.line or node, used.line or node, {'used_def': f"'{used.name}'"},
+                                 pre_solve)
                         used.satisfied = True
             if not used.satisfied:
-                if properties.get("last_use", False):
-                    for i in rda_table:
-                        for entry in rda_table[i]["use"]:
-                            if entry.name == used.name and i != node:
-                                # TODO: THIS IS AN AP - Make sure edges added here are right
-                                if not nx.has_path(cfg, i, node):
-                                    continue
-                                add_edge(final_graph, i, node, {'color': 'green'})
+                if used.core in all_classes:
+                    static_derive_class = all_classes[used.core]
+                    fields = recursively_get_children_of_types(static_derive_class, "field_declaration")
+                    for field in fields:
+                        field_pieces = st(field).replace(";", "").split()
+                        if "static" in field_pieces:
+                            if used.name.replace(used.core + ".", "") in field_pieces:
+                                processed_edges.append((get_index(field, index), node))
+                else:
+                    if not pre_solve and properties.get("last_use", False):
+                        for i in rda_table:
+                            for entry in rda_table[i]["use"]:
+                                if entry.name == used.name and i != node:
+                                    # TODO: THIS IS AN AP - Make sure edges added here are right
+                                    if i in cfg and node in cfg:
+                                        # TODO: check missing i and handle it
+                                        if not nx.has_path(cfg, i, node):
+                                            continue
+                                        add_edge(final_graph, i, node, {'color': 'green'})
+                                    # used.satisfied = True
+                            #         break
+                            # if used.satisfied:
+                            #     break
         if properties.get("last_def", False):
             for available_def in rda_solution[node]["IN"] - rda_solution[node]["OUT"]:
-                ignore_nodes = ['for_statement', 'while_statement', 'if_statement', 'switch_statement']
+                ignore_nodes = ['for_statement', 'while_statement', 'if_statement', 'switch_statement', "for_each_statement"]
                 if read_index(index, node)[-1] in ignore_nodes or read_index(index, available_def.line)[
                     -1] in ignore_nodes:
                     continue
@@ -485,11 +641,22 @@ def get_required_edges_from_def_to_use(index, cfg, rda_solution, rda_table, grap
         #                     continue
         #                 # add_edge(final_graph, bigger.line or node, smaller.line or node)
         #                 add_edge(final_graph, smaller.line or node, bigger.line or node)
-
+    if not pre_solve:
+        for edge in additional_edges:
+            if debug:
+                add_edge(final_graph, *edge, {'color': 'yellow'})
+            else:
+                add_edge(final_graph, *edge)
+        for edge in processed_edges:
+            add_edge(final_graph, *edge)
+    # for edge in twins:
+    #     continue
+    #     add_edge(final_graph, edge[0], edge[1])
+    #     add_edge(final_graph, edge[1], edge[0])
     return final_graph
 
 
-def rda_cfg_map(rda_solution, CFG_results):
+def rda_cfg_map(rda_solution, CFG_results, remove_unused=True):
     graph = CFG_results.graph
     attrs = {}
     for edge in list(graph.edges):
@@ -500,11 +667,23 @@ def rda_cfg_map(rda_solution, CFG_results):
         if intersection:
             data['label'] = ",".join([str(intr) for intr in intersection])
         else:
-            graph.remove_edge(*edge)
+            if remove_unused:
+                graph.remove_edge(*edge)
             # logger.warning("Unable to remap edge {}", edge)
         attrs[edge] = data
     nx.set_edge_attributes(graph, attrs)
     return graph
+
+
+def call_variable(call_variable_map, node, edge_for, check_virtual=True):
+    for virtual_var, actual_var in call_variable_map[node]:
+        if check_virtual:
+            if st(virtual_var) == edge_for:
+                return actual_var
+        else:
+            if st(actual_var) == edge_for:
+                return virtual_var
+    return None
 
 
 def dfg_csharp(properties, CFG_results):
@@ -520,15 +699,146 @@ def dfg_csharp(properties, CFG_results):
 
     switch_type = ['switch_expression', 'switch_statement']
     # switch_cases = ['switch_expression_arm', 'switch_section']
-    handled_cases = ["switch_section", "local_declaration_statement"]
 
     method_declaration = ['method_declaration']
     handled_types = assignment + def_statement + increment_statement + method_calls + method_declaration + switch_type
+
+    method_invocation = method_calls + ["object_creation_expression", "explicit_constructor_invocation"]
+
+    call_variable_map = {}
+    handled_cases = ["switch_section", "local_declaration_statement"] + ["class_declaration"]
 
     # if_statement = ["if_statement", "else"]
     # for_statement = ["for_statement"]
     # enhanced_for_statement = ["for_each_statement"]
     # while_statement = ["while_statement"]
+
+    additional_edges = []
+    processed_edges = []
+    cfg_graph = copy.deepcopy(CFG_results.graph)
+
+    node_list = CFG_results.node_list
+
+    all_classes = {
+        st(node_list[read_index(index, x)].child_by_field_name("name")): node_list[read_index(index, x)]
+        for x, y in cfg_graph.nodes(data=True) if 'type_label' in y and y['type_label'] == "class_declaration"
+    }
+    uninitiated_classes = [x for x, y in cfg_graph.nodes(data=True) if 'type_label' in y and
+                           y['type_label'] == "class_declaration" and cfg_graph.in_degree(x) == 0]
+
+    start_rda_init_time = time.time()
+    for edge in list(cfg_graph.edges()):
+        edge_data = cfg_graph.get_edge_data(*edge)[0]
+        # If there is object creation
+        if edge_data["label"] == "class_return":
+            # call_statement = node_list[read_index(index, edge[1])]
+            # call_node = recursively_get_children_of_types(call_statement, method_invocation)[0]
+            if read_index(index, edge[0]) not in node_list:
+                continue
+            last_statement = node_list[read_index(index, edge[0])]
+            class_node = return_first_parent_of_types(last_statement, "class_declaration")
+            class_name = st(class_node.child_by_field_name("name"))
+            class_methods = recursively_get_children_of_types(class_node, method_declaration)
+            class_id = get_index(class_node, index)
+            # find all simple paths between class_id and edge[0]
+            all_paths = nx.all_simple_paths(cfg_graph, source=class_id, target=edge[0])
+            # only_path = nx.shortest_path(cfg_graph, source=class_id, target=edge[0])
+            unique_constructor_children = set()
+            for path in all_paths:
+                for node in path:
+                    unique_constructor_children.add(node)
+            if len(unique_constructor_children) == 0:
+                unique_constructor_children.add(edge[0])
+            # unique_constructor_children = set(only_path)
+            # for nkey, nvalue in node_list.items():
+            #     if node_has_parent(nvalue, class_node):
+            #         unique_constructor_children.add(index[nkey])
+            for class_method in class_methods:
+                class_method_name = st(class_method.child_by_field_name("name"))
+                if class_method_name != class_name:
+                    add_edge(cfg_graph, edge[0], get_index(class_method, index))
+
+            for n_id in unique_constructor_children:
+                additional_edges.append((n_id, edge[1]))
+        # 702 -> 776 check C#
+        # Handle method_call edges and all constructor calls if there are parameters
+        elif edge_data["label"] in ["constructor_call", "method_call"]:
+
+            # class_attributes = ["field_declaration", "static_initializer"]
+            # Not included: ["record_declaration", "method_declaration","compact_constructor_declaration","class_declaration","interface_declaration","annotation_type_declaration","enum_declaration","block","static_initializer","constructor_declaration"]
+
+            call_statement = node_list[read_index(index, edge[0])]
+            if call_statement.type in method_invocation:
+                call_node = call_statement
+            else:
+                marked_index = int(edge_data["controlflow_type"].rsplit("|", 1)[-1])
+                call_nodes = recursively_get_children_of_types(call_statement, method_invocation)
+                for call_node in call_nodes:
+                    if marked_index == get_index(call_node, index):
+                        break
+            method = node_list[read_index(index, edge[1])]
+            if method.type == "class_declaration":
+                class_node = method
+                constructors = recursively_get_children_of_types(class_node, "constructor_declaration")
+                if constructors:
+                    if "target_constructor" in edge_data:
+                        target_constructor = edge_data["target_constructor"]
+                        for constructor in constructors:
+                            if get_index(constructor, index) == target_constructor:
+                                method = constructor
+                                break
+                    else:
+                        continue
+                        # TODO if this else is hit its an AP
+                        # method = constructors[0]
+                else:
+                    continue
+            actual_variables = recursively_get_children_of_types(call_node.child_by_field_name("arguments"), variable_type, index=parser.index,
+                                                                          stop_types=statement_types[
+                                                                              "statement_holders"])
+                # call_node.child_by_field_name("arguments")
+            virtual_variables = []
+            for node in method.named_children:
+                if "parameter_list" in node.type:
+                    virtual_variables = recursively_get_children_of_types(node, variable_type, index=parser.index,
+                                                                          stop_types=statement_types[
+                                                                              "statement_holders"])
+            if actual_variables:
+                # TODO: Handle var_args Type... IterableObject
+                var_args = False
+                if var_args or len(actual_variables) == len(virtual_variables):
+                    for actual_var, virtual_var in zip(actual_variables, virtual_variables):
+                        method_statement_id = edge[1]
+                        if method_statement_id not in call_variable_map:
+                            call_variable_map[method_statement_id] = []
+                        call_variable_map[method_statement_id].append((virtual_var, actual_var))
+                    processed_edges.append(edge)
+                else:
+                    print(edge[0], edge[1])
+                    logger.error("Number of actual and virtual variables do not match")
+                    if not var_args:
+                        pass
+                        # assert len(actual_variables) == len(virtual_variables)
+        elif edge_data["label"] == "method_return":
+            return_statement = node_list[read_index(index, edge[0])]
+            if return_statement.type == "return_statement" and return_statement.named_children:
+                processed_edges.append(edge)
+        elif edge_data["label"] == "lambda_invocation":
+            processed_edges.append(edge)
+
+    for class_id in uninitiated_classes:
+        class_node = node_list[read_index(index, class_id)]
+        class_name = st(class_node.child_by_field_name("name"))
+        class_methods = recursively_get_children_of_types(class_node, method_declaration)
+
+        descendants = [x for x in nx.descendants(cfg_graph, class_id) if
+                       cfg_graph.out_degree(x) == 0 and cfg_graph.in_degree(x) == 1]
+
+        for class_method in class_methods:
+            class_method_name = st(class_method.child_by_field_name("name"))
+            if class_method_name != class_name:
+                for descendant in descendants:
+                    add_edge(cfg_graph, descendant, get_index(class_method, index))
 
     rda_table = {}
     for root_node in traverse_tree(tree, variable_type):
@@ -554,7 +864,7 @@ def dfg_csharp(properties, CFG_results):
             parent_id = get_index(root_node, index)
             if len(root_node.children) < 2:
                 continue
-            if root_node.children[1].type == "method_invocation":
+            if root_node.children[1].type == "invocation_expression":
                 continue
             identifiers_used = recursively_get_children_of_types(root_node, variable_type, index=parser.index,
                                                                  check_list=parser.symbol_table["scope_map"])
@@ -696,6 +1006,10 @@ def dfg_csharp(properties, CFG_results):
                 statement_types["non_control_statement"] + statement_types["control_statement"],
                 stop_types=['block'] + handled_types
             )
+            if parent_statement is None:
+                continue
+            if parent_statement.type in handled_cases:
+                continue
             parent_id = get_index(parent_statement, index)
             if parent_id is None:
                 continue
@@ -722,9 +1036,145 @@ def dfg_csharp(properties, CFG_results):
                                                                  check_list=parser.symbol_table["scope_map"])
             for identifier in identifiers_used:
                 add_entry(parser, rda_table, parent_id, used=identifier)
-    rda_solution = start_rda(index, rda_table, CFG_results)
-    # pp.pprint(rda_solution)
-    final_graph = get_required_edges_from_def_to_use(CFG_results.parser.index, CFG_results.graph, rda_solution, rda_table,
-                                                     CFG_results.graph.nodes, properties=properties)
-    debug_graph = rda_cfg_map(rda_solution, CFG_results)
+    # rda_solution = start_rda(index, rda_table, CFG_results)
+    # # pp.pprint(rda_solution)
+    # final_graph = get_required_edges_from_def_to_use(CFG_results.parser.index, CFG_results.graph, rda_solution, rda_table,
+    #                                                  CFG_results.graph.nodes, properties=properties)
+    # debug_graph = rda_cfg_map(rda_solution, CFG_results)
+    # return final_graph, debug_graph, rda_table, rda_solution
+
+    end_rda_init_time = time.time()
+    end_rda_presolve_time = 0
+    start_rda_presolve_time = 0
+    end_alias_analysis_time = 0
+    start_alias_analysis_time = 0
+    if properties.get("alex_algo", True):
+        start_rda_presolve_time = time.time()
+        rda_solution = start_rda(index, rda_table, cfg_graph, pre_solve=True)
+        # pp.pprint(rda_solution)
+        final_graph = get_required_edges_from_def_to_use(index, cfg_graph, rda_solution, rda_table,
+                                                         cfg_graph.nodes, all_classes, additional_edges,
+                                                         processed_edges,
+                                                         pre_solve=True, properties=properties)
+        used_classes_or_methods = set()
+        for edge in cfg_graph.edges:
+            if "label" in cfg_graph.edges[edge] and cfg_graph.edges[edge]["label"] in ["method_call",
+                                                                                       "constructor_call"]:
+                final_graph.nodes[edge[0]][cfg_graph.edges[edge]["label"]] = edge[1]
+                used_classes_or_methods.add(edge[1])
+        end_rda_presolve_time = time.time()
+        start_alias_analysis_time = time.time()
+        al_analysis = set()
+        proc_analysis = set()
+
+        for node in final_graph.nodes:
+            if node not in used_classes_or_methods:
+                continue
+            if final_graph.nodes[node]["type_label"] == "method_declaration":
+                if "main" in final_graph.nodes[node]["label"]:
+                    continue
+                handled_node_leaf_pair = set()
+                for leaf in nx.algorithms.dag.descendants(final_graph, node):
+                    if len([x for x in final_graph.edges(leaf) if x[0] != x[1]]) == 0:
+                        # print("Leaf: ", leaf)
+                        # final_graph.add_edge(leaf, "exit")
+                        # used_names = [n.name for n in rda_table[leaf]['def']]
+                        # if len(used_names) != 1:
+                        #     logger.error("Multiple used names: %s", used_names)
+                        # get shortest path from node to leaf
+                        paths = nx.all_simple_paths(final_graph, node, leaf)
+                        # print("All_Simple: ", node, leaf)
+                        for path in paths:
+                            # get first edge in path
+                            first_edge = (path[0], path[1], 0)
+                            # get last edge in path
+                            last_edge = (path[-2], path[-1], 0)
+                            # get data for edge
+                            if "used_def" not in final_graph.edges[first_edge]:
+                                continue
+                            edge_for = final_graph.edges[first_edge]["used_def"][1:-1]
+                            # get data for last edge
+                            edge_for_last = final_graph.edges[last_edge]["used_def"][1:-1]
+                            defined_cores = [d.name for d in rda_table[leaf]["def"]]
+                            call_node = None
+                            # print("cs:" + edge_for_last)
+                            if edge_for_last not in defined_cores:
+                                # "method_return", "class_return"
+                                if any([x in final_graph.nodes[leaf] for x in ["method_call", "constructor_call"]]):
+                                    if "method_call" in final_graph.nodes[leaf]:
+                                        call_node = final_graph.nodes[leaf]["method_call"]
+                                    elif "constructor_call" in final_graph.nodes[leaf]:
+                                        call_node = final_graph.nodes[leaf]["constructor_call"]
+                            node_leaf_key = str(leaf) + "_" + str(edge_for)
+                            if node_leaf_key in handled_node_leaf_pair:
+                                continue
+                            handled_node_leaf_pair.add(node_leaf_key)
+                            if node in call_variable_map:
+                                if call_node:
+                                    proc_analysis.add((node, leaf, edge_for, call_node))
+                                # al_analysis.append((node, leaf, edge_for, call_node))
+                                if edge_for_last not in defined_cores:
+                                    n = -1
+                                    while edge_for_last not in defined_cores:
+                                        n = n - 1
+                                        if abs(n - 1) > len(path):
+                                            break
+                                        last_edge = (path[n - 1], path[n], 0)
+                                        if "used_def" not in final_graph.edges[last_edge]:
+                                            continue
+                                        edge_for_last = final_graph.edges[last_edge]["used_def"][1:-1]
+                                        defined_cores = [d.name for d in rda_table[path[n]]["def"]]
+                                        if edge_for_last in defined_cores:
+                                            al_analysis.add((node, path[n], edge_for, None))
+                                else:
+                                    al_analysis.add((node, leaf, edge_for, call_node))
+
+        while proc_analysis:
+            temp_proc_analysis = set()
+            for node, leaf, edge_for, call_node in proc_analysis:
+                completed_analysis = set()
+                for al_entry in al_analysis:
+                    if al_entry[0] == call_node:
+                        mapped_node = call_variable(call_variable_map, call_node, edge_for, check_virtual=False)
+                        if al_entry[2] != st(mapped_node):
+                            continue
+                        leaf = al_entry[1]
+                        completed_analysis.add((node, leaf, edge_for, al_entry[3]))
+                        if al_entry[3] is not None:
+                            temp_proc_analysis.add((node, leaf, edge_for, al_entry[3]))
+                al_analysis.update(completed_analysis)
+            proc_analysis = temp_proc_analysis
+
+        for node, leaf, edge_for, call_node in al_analysis:
+            mapped_node = call_variable(call_variable_map, node, edge_for)
+            # print(st(mapped_node))
+            if mapped_node:
+                if mapped_node.type == "method_invocation":
+                    # if a reference is passed back it is ignored in alias analysis
+                    # to handle turn this into a while loop and trace the return chain
+                    #     track_leaf = leaf
+                    #     leaf_node = node_list[read_index(index, track_leaf)]
+                    #     if leaf_node.type == "return_statement":
+                    # print("skipped")
+                    continue
+                # [(st(a),st(b)) for a,b in call_variable_map[100]]
+                # print(edge_for, final_graph.nodes[leaf]["label"])
+                set_add(rda_table[leaf]["def"],
+                        Identifier(parser, mapped_node, leaf, full_ref=mapped_node,
+                                   declaration=True,
+                                   method_call=True))
+        end_alias_analysis_time = time.time()
+    # print_table(index, rda_table)
+    start_rda_time = time.time()
+    rda_solution = start_rda(index, rda_table, cfg_graph)
+    final_graph = get_required_edges_from_def_to_use(index, cfg_graph, rda_solution, rda_table,
+                                                     cfg_graph.nodes, all_classes, additional_edges, processed_edges,
+                                                     pre_solve=False, properties=properties)
+    end_rda_time = time.time()
+    if debug:
+        logger.warning("RDA init, presolve, alias, rda: {}, {}, {}, {}", end_rda_init_time - start_rda_init_time,
+                       end_rda_presolve_time - start_rda_presolve_time,
+                       end_alias_analysis_time - start_alias_analysis_time,
+                       end_rda_time - start_rda_time)
+    debug_graph = rda_cfg_map(rda_solution, CFG_results, remove_unused=False)
     return final_graph, debug_graph, rda_table, rda_solution
