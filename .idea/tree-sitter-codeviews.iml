@@ -9,6 +9,7 @@
       <excludeFolder url="file://$MODULE_DIR$/data/classified_logs" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
       <excludeFolder url="file://$MODULE_DIR$/tests/data/RANDOM/dfg_rosetta" />
+      <excludeFolder url="file://$MODULE_DIR$/src/comex.egg-info" />
     </content>
     <orderEntry type="jdk" jdkName="codebert" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
