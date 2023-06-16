@@ -369,7 +369,7 @@ def recursively_get_children_of_types(
         result.extend(list(filter(lambda child: child.type in st_types, node.children)))
         additional_cs = []
         for n in result:
-            if node.type == "parameter" and n == n.parent.named_children[0]:
+            if n.type == "parameter" and n == n.parent.named_children[0]:
                 additional_cs.append(n)
         for n in additional_cs:
             result.remove(n)
@@ -576,7 +576,7 @@ def get_required_edges_from_def_to_use(index, cfg, rda_solution, rda_table, grap
                         #             if not used.core.startswith("this"):
                         #                 available_def = other_def
                         #             break
-                        add_edge(final_graph, available_def.line, node, {'used_def': used.name}, pre_solve)
+                        add_edge(final_graph, available_def.line, node, {'used_def': f"'{used.name}'"}, pre_solve)
                         used.satisfied = True
                     # else:
                     #         add_edge(final_graph, available_def.line, node, {'used_def': used.name}, pre_solve)
@@ -593,7 +593,7 @@ def get_required_edges_from_def_to_use(index, cfg, rda_solution, rda_table, grap
                             continue
 
                         # add_edge(final_graph, bigger.line or node, smaller.line or node)
-                        add_edge(final_graph, available_def.line or node, used.line or node, {'used_def': used.name},
+                        add_edge(final_graph, available_def.line or node, used.line or node, {'used_def': f"'{used.name}'"},
                                  pre_solve)
                         used.satisfied = True
             if not used.satisfied:
@@ -656,7 +656,7 @@ def get_required_edges_from_def_to_use(index, cfg, rda_solution, rda_table, grap
     return final_graph
 
 
-def rda_cfg_map(rda_solution, CFG_results):
+def rda_cfg_map(rda_solution, CFG_results, remove_unused=True):
     graph = CFG_results.graph
     attrs = {}
     for edge in list(graph.edges):
@@ -667,7 +667,8 @@ def rda_cfg_map(rda_solution, CFG_results):
         if intersection:
             data['label'] = ",".join([str(intr) for intr in intersection])
         else:
-            graph.remove_edge(*edge)
+            if remove_unused:
+                graph.remove_edge(*edge)
             # logger.warning("Unable to remap edge {}", edge)
         attrs[edge] = data
     nx.set_edge_attributes(graph, attrs)
@@ -813,6 +814,7 @@ def dfg_csharp(properties, CFG_results):
                         call_variable_map[method_statement_id].append((virtual_var, actual_var))
                     processed_edges.append(edge)
                 else:
+                    print(edge[0], edge[1])
                     logger.error("Number of actual and virtual variables do not match")
                     if not var_args:
                         pass
@@ -1088,9 +1090,11 @@ def dfg_csharp(properties, CFG_results):
                             # get last edge in path
                             last_edge = (path[-2], path[-1], 0)
                             # get data for edge
-                            edge_for = final_graph.edges[first_edge]["used_def"]
+                            if "used_def" not in final_graph.edges[first_edge]:
+                                continue
+                            edge_for = final_graph.edges[first_edge]["used_def"][1:-1]
                             # get data for last edge
-                            edge_for_last = final_graph.edges[last_edge]["used_def"]
+                            edge_for_last = final_graph.edges[last_edge]["used_def"][1:-1]
                             defined_cores = [d.name for d in rda_table[leaf]["def"]]
                             call_node = None
                             # print("cs:" + edge_for_last)
@@ -1118,7 +1122,7 @@ def dfg_csharp(properties, CFG_results):
                                         last_edge = (path[n - 1], path[n], 0)
                                         if "used_def" not in final_graph.edges[last_edge]:
                                             continue
-                                        edge_for_last = final_graph.edges[last_edge]["used_def"]
+                                        edge_for_last = final_graph.edges[last_edge]["used_def"][1:-1]
                                         defined_cores = [d.name for d in rda_table[path[n]]["def"]]
                                         if edge_for_last in defined_cores:
                                             al_analysis.add((node, path[n], edge_for, None))
@@ -1172,5 +1176,5 @@ def dfg_csharp(properties, CFG_results):
                        end_rda_presolve_time - start_rda_presolve_time,
                        end_alias_analysis_time - start_alias_analysis_time,
                        end_rda_time - start_rda_time)
-    debug_graph = rda_cfg_map(rda_solution, CFG_results)
+    debug_graph = rda_cfg_map(rda_solution, CFG_results, remove_unused=False)
     return final_graph, debug_graph, rda_table, rda_solution
