@@ -30,6 +30,15 @@ class CSParser(CustomParser):
         for child in node.parent.children:
             # print(child.type, child.text.decode('utf-8'))
             if child.type in datatypes:
+                if child.type == "implicit_type":
+                    # print("___________")
+                    try:
+                        object_type = node.named_children[-1].named_children[-1].named_children[0]
+                        return object_type.text.decode('utf-8')
+                    except:
+                        print("ERROR")
+                
+                # print(child.type, child.text.decode('utf-8'))
                 return child.text.decode('utf-8')
         return None
 
