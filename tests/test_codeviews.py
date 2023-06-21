@@ -1,7 +1,7 @@
 import json
 import os
 import shutil
-import traceback
+# import traceback
 
 from comex.codeviews.AST.AST_driver import ASTDriver
 from comex.codeviews.CFG.CFG_driver import CFGDriver
@@ -38,15 +38,15 @@ def test_combined(extension: str, test_folder: str, test_name: str):
     invoke_driver(driver, extension, test_folder, test_name, config_path)
 
 
-def test_dir(extension: str, test_folder: str, test_name: str):
-    driver = CombinedDriver
-    config_path = os.path.normpath(os.path.join(dir_check, "../config.json"))
-    try:
-        invoke_driver(driver, extension, test_folder, test_name, config_path, output_file=False)
-    except Exception:
-        error = traceback.format_exc()
-        with open(os.path.join(test_folder, test_name + ".log"), "w") as f:
-            f.write(error)
+# def test_dir(extension: str, test_folder: str, test_name: str):
+#     driver = CombinedDriver
+#     config_path = os.path.normpath(os.path.join(dir_check, "../config.json"))
+#     try:
+#         invoke_driver(driver, extension, test_folder, test_name, config_path, output_file=False)
+#     except Exception:
+#         error = traceback.format_exc()
+#         with open(os.path.join(test_folder, test_name + ".log"), "w") as f:
+#             f.write(error)
 
 
 def invoke_driver(driver, extension, test_folder, test_name, configuration=None, output_file=True):

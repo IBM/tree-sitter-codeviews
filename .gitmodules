@@ -1,6 +1,0 @@
-[submodule "src/comex/vendor/tree-sitter-c-sharp"]
-	path = src/comex/vendor/tree-sitter-c-sharp
-	url = https://github.com/tree-sitter/tree-sitter-c-sharp.git
-[submodule "src/comex/vendor/tree-sitter-java"]
-	path = src/comex/vendor/tree-sitter-java
-	url = https://github.com/tree-sitter/tree-sitter-java.git

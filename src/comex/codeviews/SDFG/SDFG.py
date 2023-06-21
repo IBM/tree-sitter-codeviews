@@ -4,19 +4,19 @@ import time
 import networkx as nx
 from loguru import logger
 
-from ...codeviews.CFG.CFG_driver import CFGDriver
-from .SDFG_csharp import dfg_csharp
-from .SDFG_java import dfg_java
-from ...utils import postprocessor, DFG_utils
+from comex.codeviews.CFG.CFG_driver import CFGDriver
+from comex.codeviews.SDFG.SDFG_csharp import dfg_csharp
+from comex.codeviews.SDFG.SDFG_java import dfg_java
+from comex.utils import postprocessor, DFG_utils
 
 debug = False
-
 
 # if any(
 #         # GITHUB_ACTIONS
 #         x in os.environ for x in ("PYCHARM_HOSTED",)
 # ):
 #     debug = True
+
 
 class DfgRda:
     def __init__(
