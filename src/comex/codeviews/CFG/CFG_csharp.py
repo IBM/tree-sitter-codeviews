@@ -137,7 +137,7 @@ class CFGGraph_csharp(CFGGraph):
             return
         else:
             for src, dest, ty, *_ in self.CFG_edge_list:
-                if src == src_node and dest == dest_node:
+                if src == src_node and dest == dest_node and "method_call" not in edge_type:
                     return
             # print(src_node, dest_node, edge_type)
             self.CFG_edge_list.append((src_node, dest_node, edge_type, additional_data))
@@ -846,12 +846,12 @@ class CFGGraph_csharp(CFGGraph):
                             return list_index
 
     def add_method_call_edges(self):
-        # print("Method List")
-        # print(*self.records["method_list"].items(), sep="\n")
+        print("Method List")
+        print(*self.records["method_list"].items(), sep="\n")
         # print("Constructor List")
         # print(*self.records["constructor_list"].items(), sep="\n")
-        # print("Function Calls")
-        # print(*self.records["function_calls"].items(), sep="\n")
+        print("Function Calls")
+        print(*self.records["function_calls"].items(), sep="\n")
         # print("Object instantiations")
         # print(*self.records["object_instantiate"].items(), sep="\n")
         # print("Constuctor Calls")
