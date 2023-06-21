@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import re
@@ -26,7 +27,8 @@ def to_dot(graph):
     return nx.nx_pydot.to_pydot(graph)
 
 
-def write_to_dot(graph, filename, output_png=False):
+def write_to_dot(og_graph, filename, output_png=False):
+    graph = copy.deepcopy(og_graph)
     if not os.getenv("GITHUB_ACTIONS"):
         for node in graph.nodes:
             if 'label' in graph.nodes[node]:

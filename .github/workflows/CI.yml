@@ -1,0 +1,32 @@
+name: CI
+
+on: [push, pull_request]
+env:
+  PYTEST_RUN_PATH: tests
+
+jobs:
+  run-tests:
+    runs-on: [ubuntu-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        fetch-depth: 1
+
+    - name: Set up python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Install plugin
+      run: pip install pytest-github-actions-annotate-failures
+
+    - name: Install Dependencies and Run Tests
+      run: |
+        pip install -r requirements-dev.txt
+        pytest --cov=src \
+               --capture=tee-sys \
+               --cov-report=term-missing:skip-covered \
+               tests
