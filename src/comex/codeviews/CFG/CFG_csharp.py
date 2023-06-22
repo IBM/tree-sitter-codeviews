@@ -846,12 +846,12 @@ class CFGGraph_csharp(CFGGraph):
                             return list_index
 
     def add_method_call_edges(self):
-        print("Method List")
-        print(*self.records["method_list"].items(), sep="\n")
+        # print("Method List")
+        # print(*self.records["method_list"].items(), sep="\n")
         # print("Constructor List")
         # print(*self.records["constructor_list"].items(), sep="\n")
-        print("Function Calls")
-        print(*self.records["function_calls"].items(), sep="\n")
+        # print("Function Calls")
+        # print(*self.records["function_calls"].items(), sep="\n")
         # print("Object instantiations")
         # print(*self.records["object_instantiate"].items(), sep="\n")
         # print("Constuctor Calls")
@@ -1139,7 +1139,7 @@ class CFGGraph_csharp(CFGGraph):
                         pass
 
             elif current_node_type in self.statement_types["not_implemented"]:
-                print("WARNING: Not implemented ", current_node_type)
+                logger.warning("WARNING: Not implemented ", current_node_type)
                 warning_counter += 1
 
         self.get_basic_blocks(self.CFG_node_list, self.CFG_edge_list)
@@ -1841,7 +1841,7 @@ class CFGGraph_csharp(CFGGraph):
                 pass
         self.add_method_call_edges()
         if warning_counter > 0:
-            print(
+            logger.warning(
                 "Total number of warnings from unimplemented statement types: ",
                 warning_counter,
             )

@@ -814,7 +814,7 @@ def dfg_csharp(properties, CFG_results):
                         call_variable_map[method_statement_id].append((virtual_var, actual_var))
                     processed_edges.append(edge)
                 else:
-                    print(edge[0], edge[1])
+                    # print(edge[0], edge[1])
                     logger.error("Number of actual and virtual variables do not match")
                     if not var_args:
                         pass

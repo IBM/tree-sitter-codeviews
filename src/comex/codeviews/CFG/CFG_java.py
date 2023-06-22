@@ -869,7 +869,7 @@ class CFGGraph_java(CFGGraph):
                         pass
 
             elif current_node_type in self.statement_types["not_implemented"]:
-                print("WARNING: Not implemented ", current_node_type)
+                logger.warning("WARNING: Not implemented ", current_node_type)
                 warning_counter += 1
 
         self.get_basic_blocks(self.CFG_node_list, self.CFG_edge_list)
@@ -1405,5 +1405,5 @@ class CFGGraph_java(CFGGraph):
         
         self.add_method_call_edges()
         if warning_counter > 0:
-            print("Total number of warnings from unimplemented statement types: ", warning_counter)
+            logger.warning("Total number of warnings from unimplemented statement types: ", warning_counter)
         return self.CFG_node_list, self.CFG_edge_list

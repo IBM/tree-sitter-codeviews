@@ -1,5 +1,5 @@
 from ..tree_parser.custom_parser import CustomParser
-
+from loguru import logger
 
 class CSParser(CustomParser):
     def __init__(self, src_language, src_code):
@@ -36,7 +36,7 @@ class CSParser(CustomParser):
                         object_type = node.named_children[-1].named_children[-1].named_children[0]
                         return object_type.text.decode('utf-8')
                     except:
-                        print("ERROR")
+                        logger.warning("ERROR")
                 
                 # print(child.type, child.text.decode('utf-8'))
                 return child.text.decode('utf-8')
