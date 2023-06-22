@@ -1,0 +1,20 @@
+{
+    "combined_views" : {
+        "AST" : {
+            "exists" : false,
+            "collapsed" : true,
+            "minimized" : false,
+            "blacklisted" : ["expression_statement", "method_invocation", "class_body", "class_declaration", "modifiers"]
+
+        },
+        "DFG" : {
+            "exists" : true,
+            "collapsed" : false,
+            "minimized" : false,
+            "statements": true
+        },
+        "CFG" : {
+            "exists" : true
+        }
+    }
+}

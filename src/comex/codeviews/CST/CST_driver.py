@@ -21,7 +21,7 @@ class CSTGraph:
         if node.children:
             for child in node.children:
                 self.postorder_traversal(child)
-        print(node.type)
+        # print(node.type)
 
     def create_CST_id(self, root_node, CST_index, CST_id):
         current_node_id = CST_id[0]
