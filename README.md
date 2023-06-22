@@ -5,8 +5,7 @@ Tree Sitter Multi Codeview Generator aims to generate combined multi-code view g
 # Comex
 `comex` is a rebuild of Tree Sitter Multi Codeview Generator for easier invocation as a Python package. This rebuild also includes a cli interface. Currently, ```comex``` generates codeviews for Java and C#, for both method-level and file-level code snippets.  ```comex``` can be used to generate over $15$ possible combinations of codeviews for both languages (complete list [here](https://github.com/IBM/tree-sitter-codeviews/blob/main/List_Of_Views.pdf)). ```comex``` is designed to be easily extendable to various programming languages. This is primarliy because we use [tree-sitter](https://tree-sitter.github.io/tree-sitter/) for parsing, a highly efficient incremental parser that supports over $40$ languages. If you wish to add support for more languages, please refer to the [contributing](https://github.com/IBM/tree-sitter-codeviews/blob/main/CONTRIBUTING.md) guide.
 
-**Note**: While C# _method-level_ support is available on the ```main``` branch, _file-level_ support is available on the ```dev``` branch but is currently under active development and testing.
-
+---
 ## Installation from PyPi
 
 `comex` is published on the Python Registry and can be easily installed via pip:
@@ -28,7 +27,7 @@ pip install -r requirements-dev.txt
 This performs an editable install, meaning that comex would be available throughout your environment (particularly relevant if you use conda or something of the sort). This means now you can interact and import from `comex` just like any other package while remaining standalone but also reflecting any code side updates without any other manual steps
 
 ---
-### Usage as a CLI
+## Usage as a CLI
 
 This is the recommended way to get started with `comex` as it is the most user friendly
 
@@ -42,7 +41,7 @@ For example, to generate a combined CFG and DFG graph for a java file, you can r
 comex --lang "java" --code-file ./test.java --graphs "cfg,dfg"
 ```
 
-### Usage as a Python Package
+## Usage as a Python Package
 
 The comex package can be used by importing required drivers as follows:
 
@@ -70,8 +69,35 @@ graph_format: denotes the format of the output graph. Currently supported format
 
 codeviews: refers to the configuration passed for each codeview
 ````
+---
+## Limitations
 
-### Output Examples:
+While `comex` provides _method-level_ and _file-level_ support for both Java and C\#, it's important to note the following limitations and known issues:
+
+### Java
+- **No Inter-file Analysis Support**: The tool currently does not support codeviews that involve interactions between multiple Java files. It is designed to generate codeviews for individual Java files only.
+
+- **Syntax Errors in Code**: Despite supporting non-compileable code, to ensure accurate codeviews, the input Java code must be free of syntax errors. Code with syntax errors may not be correctly parsed and displayed in the generated codeviews.
+
+- **Limited Support for Function Call Arguments**: The tool does not provide proper support for when a function call is passed as an argument to another function call in Java code. The resulting codeview might not accurately represent the intended behavior in such cases.
+
+### C\#
+In addition to the limitations mentioned for Java, the tool has the following limitations specific to C#:
+
+- **No Support for Lambda Functions and Arrow Expressions**: The tool does not support codeviews involving lambda functions and arrow expressions in C#. The generated codeviews may not accurately represent these language features.
+
+- **No Support for Compiler Directives**: Compiler directives, such as pragma directives, are not supported by the tool. Code involving such directives may not be properly displayed in the generated codeviews.
+
+- **Incomplete Operator Declaration Support**: The tool may have limited support for operator declarations in C#. Certain constraints and edge cases related to operator overloading might not be fully captured in the generated codeviews.
+
+- **Limited Support for Inheritance and Abstraction**: The tool's support for inheritance and abstraction in C# is not fully comprehensive. Codeviews involving complex inheritance hierarchies or advanced abstraction patterns may not be accurately represented.
+
+Please note that while we continuously work to improve the tool and address these limitations, the current implementation may not be perfect. We appreciate your understanding and encourage you to provide feedback and report any issues you encounter, as this helps us enhance the tool's capabilities.
+
+---
+
+
+## Output Examples:
 
 Combined simple AST+CFG+DFG for a simple Java program that finds the maximum among 2 numbers:
 
