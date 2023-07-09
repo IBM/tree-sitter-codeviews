@@ -31,7 +31,7 @@ def main(
         output: str = typer.Option("dot", help="all/json/dot (dot generates png as well)"),
         blacklisted: str = typer.Option("", help="Nodes to be removed from the AST"),
         collapsed: bool = typer.Option(False, help="Collapses all occurrences of a variable into one node"),
-        statements: bool = typer.Option(True, help="Converts DFG output to statement level and uses RDA"),
+        # statements: bool = typer.Option(True, help="Converts DFG output to statement level and uses RDA"),
         last_def: bool = typer.Option(False, help="Adds last definition information to the DFG"),
         last_use: bool = typer.Option(False, help="Adds last use information to the DFG"),
         throw_parse_error: bool = typer.Option(False, help="Throws an error if the code cannot be parsed"),
@@ -65,7 +65,7 @@ def main(
             "exists": False,
             "collapsed": collapsed,
             "minimized": False,
-            "statements": statements,
+            "statements": True,
             "last_def": last_def,
             "last_use": last_use
         },
@@ -86,7 +86,7 @@ def main(
             "exists": True,
             "collapsed": collapsed,
             "minimized": False,
-            "statements": statements,
+            "statements": True,
             "last_def": last_def,
             "last_use": last_use
         }
