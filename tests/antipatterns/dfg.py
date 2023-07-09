@@ -31,7 +31,12 @@ class Dataset:
             for path in Path(file).rglob(f'*.{self.extension}'):
                 self.lines.append(path.read_text())
         else:
-            if kind == "search":
+            if self.extension == "json":
+                self.extension = kind
+                df = pd.read_json(file)
+                df = self.df_filter(df)
+                self.lines = df["flines"].tolist()
+            elif kind == "search":
                 include_path = file.rsplit(".", 1)[0] + ".txt"
                 include_list = []
                 if os.path.exists(include_path) and min_set:
@@ -46,6 +51,9 @@ class Dataset:
             else:
                 with open(file, "r") as f:
                     self.lines = f.read().splitlines()
+
+        self.save_successful_runs = False
+
         self.kind = kind
         self.driver = None
         self.graph = {}
@@ -54,6 +62,9 @@ class Dataset:
         self.index = {}
         self.analyze(CombinedDriver, kind=kind)
         self.result = None
+
+    def df_filter(self, df):
+        return df
 
     def run(self, driver, ind, languages=None):
         # record start time
@@ -109,8 +120,8 @@ class Dataset:
         # FAILURE
         try:
             result = self.run(self.driver, ind)
-            self.result = result[self.extension].results["DFG"]
-            self.rda_table = self.result.rda_table
+            # self.result = result[self.extension].results["DFG"]
+            # self.rda_table = self.result.rda_table
             self.graph[ind] = result[self.extension].graph
 
             # check if graph has no edges
@@ -172,8 +183,10 @@ class Dataset:
             # #     logger.error("AP1: Missing edge: {}", ind)
             # #     AP1 = AP1 + 1
             # #     continue
-            self.manual_check(ind, prefix=self.extension + "-SUCCESS", formats="dot", actual_src=actual_src, type=self.kind)
-            return "success"
+            if self.save_successful_runs:
+                self.manual_check(ind, prefix=self.extension + "-SUCCESS", formats="dot", actual_src=actual_src, type=self.kind)
+                return "success"
+            return "skipped"
         except Exception as e:
             logger.error("FAIL: ID: {} | Error: {}", ind, e)
             error = traceback.format_exc()
