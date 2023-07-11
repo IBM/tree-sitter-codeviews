@@ -8,3 +8,4 @@ dist/
 /tests/data/RANDOM/dfg_rosetta
 tests/**/*.dot
 tests/**/*.png
+/tests/data/RANDOM/gcj.json
