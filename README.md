@@ -5,6 +5,23 @@ Tree Sitter Multi Codeview Generator aims to generate combined multi-code view g
 # Comex
 `comex` is a rebuild of Tree Sitter Multi Codeview Generator for easier invocation as a Python package. This rebuild also includes a cli interface. Currently, ```comex``` generates codeviews for Java and C#, for both method-level and file-level code snippets.  ```comex``` can be used to generate over $15$ possible combinations of codeviews for both languages (complete list [here](https://github.com/IBM/tree-sitter-codeviews/blob/main/List_Of_Views.pdf)). ```comex``` is designed to be easily extendable to various programming languages. This is primarliy because we use [tree-sitter](https://tree-sitter.github.io/tree-sitter/) for parsing, a highly efficient incremental parser that supports over $40$ languages. If you wish to add support for more languages, please refer to the [contributing](https://github.com/IBM/tree-sitter-codeviews/blob/main/CONTRIBUTING.md) guide.
 
+If you wish to learn more about the approach taken, here are some conference talks and publications:
+- ASE 2023 demonstration: [COMEX: A Tool for Generating Customized Source Code Representations](https://arxiv.org/abs/2307.04693)
+- ICSE 2023 tutorial: [The Landscape of Source Code Representation Learning in AI-Driven Software Engineering Tasks](https://research.ibm.com/publications/the-landscape-of-source-code-representation-learning-in-ai-driven-software-engineering-tasks)
+
+## Cite Comex
+If you use Comex in your research, please cite our work by using the following BibTeX entry:
+```
+@misc{das2023comex,
+      title={COMEX: A Tool for Generating Customized Source Code Representations}, 
+      author={Debeshee Das and Noble Saji Mathews and Alex Mathai and Srikanth Tamilselvam and Kranthi Sedamaki and Sridhar Chimalakonda and Atul Kumar},
+      year={2023},
+      eprint={2307.04693},
+      archivePrefix={arXiv},
+      primaryClass={cs.SE}
+}
+```
+
 ---
 ## Installation from PyPi
 
