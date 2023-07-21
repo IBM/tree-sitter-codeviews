@@ -9,7 +9,9 @@ import typer
 from loguru import logger
 
 from .codeviews.combined_graph.combined_driver import CombinedDriver
+from . import get_language_map
 
+get_language_map()
 app = typer.Typer()
 
 
