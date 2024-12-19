@@ -9,16 +9,21 @@ If you wish to learn more about the approach taken, here are some conference tal
 - ASE 2023 demonstration: [COMEX: A Tool for Generating Customized Source Code Representations](https://arxiv.org/abs/2307.04693)
 - ICSE 2023 tutorial: [The Landscape of Source Code Representation Learning in AI-Driven Software Engineering Tasks](https://research.ibm.com/publications/the-landscape-of-source-code-representation-learning-in-ai-driven-software-engineering-tasks)
 
+Comex played a critical role in developing `CodeSAM`, a novel framework for infusing multiple code-views into transformer-based models. CodeSAM builds on tools like `comex` to create structured code representations (e.g., AST, CFG, DFG), enabling fine-tuning of language models like CodeBERT. Experimental results show that by using this technique, we can improve downstream performance when compared to SLMs like GraphCodeBERT and CodeBERT on ML for SE tasks by utilizing individual code-views or a combination of code-views during fine-tuning.
+
+You can find more details about `CodeSAM` in the following pre-print:
+- [CodeSAM: Source Code Representation Learning by Infusing Self-Attention with Multi-Code-View Graphs](https://arxiv.org/abs/2411.14611)
+
 ## Cite Comex
 If you use Comex in your research, please cite our work by using the following BibTeX entry:
 ```
-@misc{das2023comex,
-      title={COMEX: A Tool for Generating Customized Source Code Representations}, 
-      author={Debeshee Das and Noble Saji Mathews and Alex Mathai and Srikanth Tamilselvam and Kranthi Sedamaki and Sridhar Chimalakonda and Atul Kumar},
-      year={2023},
-      eprint={2307.04693},
-      archivePrefix={arXiv},
-      primaryClass={cs.SE}
+@inproceedings{das2023comex,
+  title={COMEX: A Tool for Generating Customized Source Code Representations},
+  author={Das, Debeshee and Mathews, Noble Saji and Mathai, Alex and Tamilselvam, Srikanth and Sedamaki, Kranthi and Chimalakonda, Sridhar and Kumar, Atul},
+  booktitle={2023 38th IEEE/ACM International Conference on Automated Software Engineering (ASE)},
+  pages={2054--2057},
+  year={2023},
+  organization={IEEE}
 }
 ```
 
